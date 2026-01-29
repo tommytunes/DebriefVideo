@@ -8,12 +8,16 @@ function MediaDropZone() {
 
     const onDrop = useCallback(async (acceptedFiles) => {
         const videos = await Promise.all( 
-        acceptedFiles.map(async file => ({
+        acceptedFiles.map(async file => {
+          const { creation, duration } = await extractMetaDataVideo(file);
+          return {
             id: crypto.randomUUID(),
             file,
             url: URL.createObjectURL(file),
-            timestamp: await extractMetaDataVideo(file)
-        }))) 
+            timestamp: creation,
+            duration: duration
+          };
+        })); 
 
         dispatch({type: 'ADD_VIDEO', payload: videos });
     }, [dispatch]);

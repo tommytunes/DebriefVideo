@@ -1,20 +1,33 @@
 import { useVideo } from '../contexts/VideoContext';
+import { FindActiveVideo } from '../utils/FindActiveVideo';
+import { usePlayback } from '../hooks/usePlayback';
+import { useEffect } from 'react';
 
 function VideoPlayback() {
     const { state } = useVideo();                                                                                           
-     const { videos } = state;                                                                                               
-                                                                                                                             
-     console.log('VideoPlayback render, videos:', videos);  
+    const videos = state.videos;
+    const { currentTime } = usePlayback();
 
+
+
+    const {video, offsetInVideo, isGap } = FindActiveVideo(videos, currentTime);
+                                                                                                                             
     return (
         <>
-        {videos.map((e) => (
-        <div key={e.id} className="w-[640px] h-[360px] bg-black overflow-hidden">
+        {!isGap ? 
+        <div key={video.id} className="w-[640px] h-[360px] bg-black overflow-hidden">
             <video
-            src={e.url}
+            src={video.url}
             className="w-full h-full object-cover"
             controls/>
-        </div> ))}
+        </div> :
+
+        <div className="w-[640px] h-[360px] bg-black overflow-hidden">
+            <video
+            className="w-full h-full object-cover"
+            controls/>
+        </div>
+        }
         </>
     );
 }
