@@ -6,7 +6,6 @@ const initialState = {
     audioClips: [],
     currentTime: 0,
     isPlaying: false,
-    isSeeking: false
 };
 
 function videoReducer(state, action) {
@@ -25,10 +24,9 @@ function videoReducer(state, action) {
         case 'SET_PLAYING':
             return {...state, isPlaying: action.payload};
 
-        case 'SET_SEEKING':
-            return {...state, isSeeking: action.payload};
         case 'INCREMENT_TIME':
             return {...state, currentTime: state.currentTime + action.payload};
+            
         case 'REMOVE_VIDEO':
             const newVids = state.videos.filter(v => v.id !== action.payload);
             return {...state, videos: newVids};

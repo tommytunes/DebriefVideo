@@ -6,10 +6,8 @@ import { useRef, useEffect } from 'react';
 function VideoPlayback() {
     const { state } = useVideo();                                                                                           
     const videos = state.videos;
-    const { currentTime, isPlaying, isSeeking } = usePlayback();
+    const { currentTime } = usePlayback();
     const videoRef = useRef(null);
-    const previousVideoRef = useRef(null);
-
     
     const {video, offsetInVideo, isGap } = FindActiveVideo(videos, currentTime);
 
@@ -18,28 +16,9 @@ function VideoPlayback() {
     useEffect(() => {
         if (!videoRef.current || !video) return;
 
-        const videoIdChanged = video?.id !== previousVideoRef.current;
-        const drift = offsetInVideo - videoRef.current.currentTime;
+        videoRef.current.currentTime = offsetInVideo;
 
-        if (isSeeking || videoIdChanged || Math.abs(drift) > 0.1) {
-            videoRef.current.currentTime = offsetInVideo;
-        }
-
-        previousVideoRef.current = video?.id;
-    }, [video?.id, isSeeking, offsetInVideo]);
-
-    // Handle play/pause separately - only when isPlaying changes
-    useEffect(() => {
-        if (!videoRef.current || !video || isGap) return;
-
-        if (state.isPlaying) {
-            videoRef.current.play();
-        } else {
-            videoRef.current.pause();
-        }
-    }, [state.isPlaying, video, isGap]);
-
-
+    }, [video?.id, offsetInVideo]);
                                                                                                                              
     return (
         <>
