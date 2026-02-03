@@ -1,10 +1,12 @@
 import { createContext, useContext, useReducer } from "react";
+import { useMasterClock } from "../hooks/useMasterClock";
 
 const initialState = {
     videos: [],
     audioClips: [],
     currentTime: 0,
-    isPlaying: false
+    isPlaying: false,
+    isSeeking: false
 };
 
 function videoReducer(state, action) {
@@ -23,6 +25,10 @@ function videoReducer(state, action) {
         case 'SET_PLAYING':
             return {...state, isPlaying: action.payload};
 
+        case 'SET_SEEKING':
+            return {...state, isSeeking: action.payload};
+        case 'INCREMENT_TIME':
+            return {...state, currentTime: state.currentTime + action.payload};
         case 'REMOVE_VIDEO':
             const newVids = state.videos.filter(v => v.id !== action.payload);
             return {...state, videos: newVids};
@@ -46,7 +52,7 @@ export function useVideo() {
 
 export function VideoProvider({ children }) {
     const [state, dispatch] = useReducer(videoReducer, initialState);
-
+    useMasterClock(state.isPlaying, dispatch);
     return (
         <VideoContext.Provider value={{state, dispatch}}>
             {children}
