@@ -2,26 +2,24 @@ import { usePlayback } from "../hooks/usePlayback";
 import { useMemo } from "react";
 import { useVideo } from "../contexts/VideoContext";
 
-export function PlaybackControl() {
+const PlaybackControl = () => {
     const { isPlaying, currentTime, currentTimestamp, play, pause, seek } = usePlayback();
     const { state } = useVideo();
      
-    const timelineDuration = useMemo(() => {
-        if (state.videos.length === 0) return;
+    /*const timelineDuration = useMemo(() => {
+        const group = state.videoGroups.find( group => group.id === groupId);
+        if (!group) return;
+        if (group.videos.length === 0) return;
 
-        const firstVideo = state.videos[0];
-        const lastVideo = state.videos[state.videos.length - 1];
+        const firstVideo = group.videos[0];
+        const lastVideo = group.videos[state.videos.length - 1];
 
         const firstTime = firstVideo.timestamp.getTime();
         const endTime = lastVideo.timestamp.getTime() + (lastVideo.duration * 1000);
 
         return (endTime - firstTime) / 1000;
-    }, [state.videos]);
-
-    const handleSliderChange = (e) => {
-        const newTime = parseFloat(e.target.value);
-        seek(newTime);
-    };
+    }, [state.videoGroups, groupId]);
+*/
 
     return (
         <>
@@ -36,7 +34,7 @@ export function PlaybackControl() {
                  <button onClick={() => seek(currentTime - 5)}>-5s</button>                                                                                       
                  <button onClick={() => seek(currentTime + 5)}>+5s</button>                                                                                       
              </div> 
-            <span>{currentTime}s / {timelineDuration}s</span>                                         
+                                                
 
         </>
     )

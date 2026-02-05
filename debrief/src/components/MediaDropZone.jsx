@@ -3,7 +3,7 @@ import React, {useCallback} from 'react'
 import {useDropzone} from 'react-dropzone'
 import { extractMetaDataVideo } from '../utils/MetaData';
 
-function MediaDropZone() {
+function MediaDropZone({ groupId }) {
     const { dispatch } = useVideo();
 
     const onDrop = useCallback(async (acceptedFiles) => {
@@ -19,7 +19,7 @@ function MediaDropZone() {
           };
         })); 
 
-        dispatch({type: 'ADD_VIDEO', payload: videos });
+        dispatch({type: 'ADD_VIDEO', payload: {videos, groupId }});
     }, [dispatch]);
 
     const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop, accept: {                                                                                                      

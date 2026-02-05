@@ -16,11 +16,13 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.18",
+    "@xzdarcy/react-timeline-editor": "^1.0.0",
     "mp4-metadata": "^1.0.2",
     "mp4box": "^2.3.0",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
     "react-dropzone": "^14.3.8",
+    "react-router-dom": "^7.13.0",
     "tailwindcss": "^4.1.18"
   },
   "devDependencies": {
@@ -29,6 +31,7 @@
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.1",
     "babel-plugin-react-compiler": "^1.0.0",
+    "daisyui": "^5.5.17",
     "eslint": "^9.39.1",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.24",

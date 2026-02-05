@@ -1,6 +1,10 @@
 
 
-export function FindActiveVideo(videos, currentTime) {
+export function FindActiveVideo(group, currentTime) {
+    if (!group) return {video: null, offsetInVideo: 0, isGap: true};
+
+    const videos = group.videos;
+
     if (videos.length === 0) return {video: null, offsetInVideo: 0, isGap: true};
 
     const timelineStart = videos[0].timestamp.getTime();
