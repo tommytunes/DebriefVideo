@@ -1,0 +1,33 @@
+.timeline-editor-example1 {
+  .timeline-editor-config {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 10px;
+  }
+  .timeline-editor-config-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    &:not(:last-child) {
+      margin-right: 20px;
+    }
+  }
+  .timeline-editor {
+    width: 100%;
+    height: 300px;
+
+    &-action {
+      height: 28px !important;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+  }
+  .timeline-editor-time-area {
+    height: 48px !important;
+  }
+  .timeline-editor-cursor {
+    top: 48px !important;
+    height: calc(100% - 48px) !important;
+  }
+}

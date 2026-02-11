@@ -15,7 +15,7 @@ function App() {
     <>
     <NavBar />
     <Routes>
-      <Route path="/" element={<><VideoGroupSelection /><VideoPlayback /><PlaybackControl /></>} />
+      <Route path="/" element={<><VideoGroupSelection /><VideoPlayback /><PlaybackControl /><TimelineEditor /></>} />
       <Route path="/files" element={<><VideoSource /></>} />
     </Routes>
     </>
