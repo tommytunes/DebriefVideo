@@ -5,21 +5,8 @@ import { useVideo } from "../contexts/VideoContext";
 const PlaybackControl = () => {
     const { isPlaying, currentTime, currentTimestamp, play, pause, seek } = usePlayback();
     const { state } = useVideo();
-     
-    /*const timelineDuration = useMemo(() => {
-        const group = state.videoGroups.find( group => group.id === groupId);
-        if (!group) return;
-        if (group.videos.length === 0) return;
+    
 
-        const firstVideo = group.videos[0];
-        const lastVideo = group.videos[state.videos.length - 1];
-
-        const firstTime = firstVideo.timestamp.getTime();
-        const endTime = lastVideo.timestamp.getTime() + (lastVideo.duration * 1000);
-
-        return (endTime - firstTime) / 1000;
-    }, [state.videoGroups, groupId]);
-*/
 
     return (
         <>
@@ -33,7 +20,8 @@ const PlaybackControl = () => {
                  <button onClick={() => seek(60)}>Jump to 60s</button>                                                                                            
                  <button onClick={() => seek(currentTime - 5)}>-5s</button>                                                                                       
                  <button onClick={() => seek(currentTime + 5)}>+5s</button>                                                                                       
-             </div> 
+             </div>
+             <p>{state.currentTime}</p>
                                                 
 
         </>
