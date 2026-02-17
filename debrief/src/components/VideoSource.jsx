@@ -1,6 +1,8 @@
 import MediaDropZone from "./MediaDropZone";
 import { useVideo } from '../contexts/VideoContext';
 import { useState } from 'react';
+import { extractMetaDataVideo } from '../utils/MetaData';
+
 
 const VideoSource = () => {
 
@@ -25,6 +27,15 @@ const VideoSource = () => {
     const handleDeleteVideo = (groupId, videoId) => {
         dispatch({type: 'REMOVE_VIDEO', payload: {groupId: groupId, videoId: videoId}});
     };
+
+    const onFilesVideo = async (files, handles, groupId) => {
+        const videos = await Promise.all(files.map(async file => {
+              const { creation, duration } = await extractMetaDataVideo(file);
+              return { id: crypto.randomUUID(), file, url: URL.createObjectURL(file), timestamp: creation, duration };
+          }));
+          dispatch({ type: 'ADD_VIDEO', payload: { videos, groupId } });
+      };
+
 
     return (
         <>
@@ -53,14 +64,19 @@ const VideoSource = () => {
                                 {group.videos.map( (video) => (
                                     <div key={video.id} className="list-row">
                                         <div>
-                                            <li className="list-col-grow">{video.file.path}</li>
+                                            <li className="list-col-grow">{video.file.name}</li>
                                             <p className="text-xs">{video.timestamp.toLocaleTimeString()}</p>
                                         </div>
                                         <button onClick={() => handleDeleteVideo(group.id, video.id)} className=" btn btn-sm">Delete</button>
                                     </div>
                                 ))}
                             </ul>
-                            <MediaDropZone groupId={group.id}/>
+                            <MediaDropZone 
+                            groupId={group.id}
+                            accept={{ "video/mp4": [".mp4"], "video/quicktime": [".mov"] }}
+                            label="Add Videos"
+                            onFiles={onFilesVideo}
+                            />
                         </div>
                     </div>
                 ))

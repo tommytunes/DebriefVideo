@@ -3,13 +3,35 @@ import React, {useCallback} from 'react'
 import {useDropzone} from 'react-dropzone'
 import { extractMetaDataVideo } from '../utils/MetaData';
 
-function MediaDropZone({ groupId }) {
-    const { dispatch } = useVideo();
+function MediaDropZone({ groupId, accept, label, onFiles }) {
+    
+  /*const { dispatch } = useVideo();
 
-    const onDrop = useCallback(async (acceptedFiles) => {
-        const videos = await Promise.all( 
-        acceptedFiles.map(async file => {
-          const { creation, duration } = await extractMetaDataVideo(file);
+    let fileHandles;
+
+    const fileFromHandle = async (handle) => {
+        const file = await handle.getFile();
+        return {file, handle};
+    };
+
+    const onClick = async () => {
+      fileHandles = await window.showOpenFilePicker({
+        types: [
+        {
+          description: "Video Files",
+          accept: {
+            "video/mp4": [".mp4"],
+            "video/quicktime": [".mov"],
+          },
+        },
+      ],
+      excludeAcceptAllOption: true,
+      multiple: true,
+      });
+
+      const videos = await Promise.all(fileHandles.map( async fileHandle => {
+        const { file, handle } = await fileFromHandle(fileHandle);
+        const { creation, duration } = await extractMetaDataVideo(file);
           return {
             id: crypto.randomUUID(),
             file,
@@ -17,26 +39,33 @@ function MediaDropZone({ groupId }) {
             timestamp: creation,
             duration: duration
           };
-        })); 
+      }));
+      
+      dispatch({type: 'ADD_VIDEO', payload: {videos, groupId }});
 
-        dispatch({type: 'ADD_VIDEO', payload: {videos, groupId }});
-    }, [dispatch]);
-
-    const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop, accept: {                                                                                                      
-          'video/mp4': ['.mp4'],                                                                                     
-          'video/quicktime': ['.mov']                                                                                
-      }});
+    };
 
   return (
-    <div {...getRootProps()}>
-      <input {...getInputProps()} />
-      {
-        isDragActive ?
-          <p>Drop the files here ...</p> :
-          <p>Drag 'n' drop some files here, or click to select files</p>
-      }
-    </div>
-  )
+    <button type='file' onClick={onClick} className='btn btn-secondary'>File here</button>
+  ) */
+
+  const onClick = async () => {                                                                                                                       
+          const handles = await window.showOpenFilePicker({                                                                                               
+              types: [{ description: label, accept }],                                                                                                    
+              excludeAcceptAllOption: true,                                                                                                               
+              multiple: true,
+          });
+          const files = await Promise.all(
+              handles.map(handle => handle.getFile())
+          );
+          onFiles(files, handles, groupId);
+      };
+
+      return (
+          <button onClick={onClick}>{label}</button>
+      );
 }
+
+
 
 export default MediaDropZone;
