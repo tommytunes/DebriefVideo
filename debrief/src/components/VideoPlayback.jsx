@@ -2,7 +2,7 @@ import { useVideo } from '../contexts/VideoContext';
 import { FindActiveVideo } from '../utils/FindActiveVideo';
 import { FindTimelineStart } from '../utils/FindTimelineStart';
 import { usePlayback } from '../hooks/usePlayback';
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect,  useLayoutEffect, useEffectEvent } from 'react';
 import { useMasterClock } from '../hooks/useMasterClock';
 
 const VideoPlayback = () => {
@@ -95,7 +95,7 @@ const VideoPlayback = () => {
 
     // Effect 5: Seeking 
     useEffect(() => {
-        if (!isPlaying) return;
+        //if (!isPlaying) return;
 
         if (videoRef1.current && video1) videoRef1.current.currentTime = offsetInVideo1;
         if (videoRef2.current && video2) videoRef2.current.currentTime = offsetInVideo2;

@@ -12,13 +12,24 @@ function App() {
   //      <Route path="/" element={<><VideoGroupSelection></VideoGroupSelection><VideoPlayback /><PlaybackControl /><TimelineEditor /></>} />
 
   return (
-    <>
+    <div className="flex flex-col h-screen">
     <NavBar />
     <Routes>
-      <Route path="/" element={<><VideoGroupSelection /><VideoPlayback /><PlaybackControl /><TimelineEditor /></>} />
+      <Route path="/" element={
+      <>
+      <div className="flex-1">
+        <VideoGroupSelection />
+        <VideoPlayback />
+        
+      </div>
+        <PlaybackControl />
+        <TimelineEditor />
+        </>
+      } />
+
       <Route path="/files" element={<><VideoSource /></>} />
     </Routes>
-    </>
+    </div>
   )
 }
 

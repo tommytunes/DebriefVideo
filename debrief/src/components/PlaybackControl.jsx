@@ -1,30 +1,47 @@
 import { usePlayback } from "../hooks/usePlayback";
-import { useMemo } from "react";
+import { useEffect } from "react";
 import { useVideo } from "../contexts/VideoContext";
 
 const PlaybackControl = () => {
     const { isPlaying, currentTime, currentTimestamp, play, pause, seek } = usePlayback();
     const { state } = useVideo();
     
-
-
-    return (
-        <>
-            {!isPlaying ?
-                <button onClick={play}>Play</button> :
-                <button onClick={pause}>Pause</button>
+    useEffect(() => {
+        const handleKeyDown = (event) => {
+            if (event.code === "Space") {
+                event.preventDefault();
+                if (isPlaying) {
+                    pause();
+                } else {
+                    play();
+                }
             }
-            <div style={{ margin: '10px 0', display: 'flex', gap: '5px' }}>                                                                                      
-                 <button onClick={() => seek(0)}>Jump to 0s</button>                                                                                              
-                 <button onClick={() => seek(30)}>Jump to 30s</button>                                                                                            
-                 <button onClick={() => seek(60)}>Jump to 60s</button>                                                                                            
-                 <button onClick={() => seek(currentTime - 5)}>-5s</button>                                                                                       
-                 <button onClick={() => seek(currentTime + 5)}>+5s</button>                                                                                       
-             </div>
-             <p>{state.currentTime}</p>
-                                                
+            if (event.code === "ArrowLeft") {
+                event.preventDefault();
+                seek( currentTime - 5);
+            }
 
-        </>
+            if (event.code === "ArrowRight") {
+                event.preventDefault();
+                seek( currentTime + 5);
+            }
+        }
+            window.addEventListener("keydown", handleKeyDown);
+
+            return () => {
+                window.removeEventListener("keydown", handleKeyDown);
+            };
+    }, [state.isPlaying, state.isSeeking]);
+
+    
+     
+    return (
+        <div className="flex flex-row"> 
+            {!isPlaying ?
+                <button onClick={play} className="px-4 py-2">▶</button> :
+                <button onClick={pause} className="px-4 py-2">▐▐</button>
+            }
+        </div>
     )
 }
 
