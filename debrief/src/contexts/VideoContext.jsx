@@ -5,7 +5,7 @@ const initialState = {
     audioClips: [],
     currentTime: 0,
     isPlaying: false,
-    isSeeking: false,
+    isSeeking: {seeking: false, id: 0},
     groupIdVideo1: null,
     groupIdVideo2: null
 };
@@ -53,7 +53,7 @@ function videoReducer(state, action) {
             return {...state, isPlaying: action.payload};
 
         case 'SET_SEEKING':
-            return {...state, isSeeking: action.payload};
+            return {...state, isSeeking: {seeking: action.payload, id: state.isSeeking.id++}};
 
         case 'INCREMENT_TIME':
             return {...state, currentTime: state.currentTime + action.payload};

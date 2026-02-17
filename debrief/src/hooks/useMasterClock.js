@@ -30,7 +30,7 @@ export function useMasterClock(isPlaying, dispatch, timelineStart, clockSources)
             }
         }
         
-        if (!state.isSeeking) {
+        if (!state.isSeeking.seeking) {
             if (clockVideo) {
             lastRafId.current = now;
             const globalTime = (clockVideo.videoTimestamp.getTime() + clockVideo.videoRef.current.currentTime * 1000 - timelineStart) / 1000;

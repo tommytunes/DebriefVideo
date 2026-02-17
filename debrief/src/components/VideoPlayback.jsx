@@ -95,12 +95,12 @@ const VideoPlayback = () => {
 
     // Effect 5: Seeking 
     useEffect(() => {
-        //if (!isPlaying) return;
+        if (!state.isSeeking.seeking) return;
 
         if (videoRef1.current && video1) videoRef1.current.currentTime = offsetInVideo1;
         if (videoRef2.current && video2) videoRef2.current.currentTime = offsetInVideo2;
         dispatch({type: 'SET_SEEKING', payload: false});
-    }, [state.isSeeking]);
+    }, [state.isSeeking.id]);
     
 
     return (

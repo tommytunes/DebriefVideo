@@ -1,5 +1,4 @@
 import { useVideo } from '../contexts/VideoContext';
-import {useRef} from 'react';
 
 
 export function usePlayback() {
