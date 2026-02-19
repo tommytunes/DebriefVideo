@@ -22,6 +22,4 @@ function MediaDropZone({ groupId, accept, label, onFiles }) {
       );
 }
 
-
-
 export default MediaDropZone;

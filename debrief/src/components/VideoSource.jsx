@@ -52,7 +52,7 @@ const VideoSource = () => {
             </div>
         </div>
                 {state.videoGroups.length === 0 ?
-                <h1>No Groups Added Yet</h1> :
+                <></> :
                 state.videoGroups.map( group => (
                     <div key={group.id} className="card card-border w-100 m-10">
                         <div className="card-body">

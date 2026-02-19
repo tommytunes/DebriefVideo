@@ -1,0 +1,11 @@
+appId: com.videodebrief.app
+productName: VideoDebrief
+directories:
+  output: release
+files:
+  - dist/**/*
+  - electron/**/*
+mac:
+  category: public.app-category.video
+win:
+  target: nsis
