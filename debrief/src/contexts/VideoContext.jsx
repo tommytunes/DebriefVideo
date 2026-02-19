@@ -2,7 +2,7 @@ import { createContext, useContext, useReducer } from "react";
 
 const initialState = {
     videoGroups: [],
-    audioClips: [],
+    audioGroups: [],
     currentTime: 0,
     isPlaying: false,
     isSeeking: {seeking: false, id: 0},
@@ -21,19 +21,33 @@ function videoReducer(state, action) {
             ]}
         
         case 'DELETE_VIDEO_GROUP':
-            const deleteGroups = state.videoGroups.filter(group =>
+            const deleteVideoGroups = state.videoGroups.filter(group =>
                 group.id !== action.payload
             );
-            return {...state, videoGroups: deleteGroups };
+            return {...state, videoGroups: deleteVideoGroups };
+        
+        case 'ADD_AUDIO_GROUP':
+            return {...state, audioGroups: [...state.audioGroups, {
+                id: crypto.randomUUID(),
+                name: action.payload,
+                audios: []
+            }
+            ]}
+
+        case 'DELETE_AUDIO_GROUP':
+            const deleteAudioGroups = state.videoGroups.filter(group =>
+                group.id !== action.payload
+            );
+            return {...state, videoGroups: deleteAudioGroups };
 
         case 'ADD_VIDEO':
-            const { videos, groupId } = action.payload;
-            const newGroups = state.videoGroups.map((group) =>
-                group.id === groupId
+            const { videos, groupId: groupIdVideo } = action.payload;
+            const newVideoGroups = state.videoGroups.map((group) =>
+                group.id === groupIdVideo
                     ? { ...group, videos: [...group.videos, ...videos].sort((a, b) => a.timestamp - b.timestamp) }
                     : group
             );
-            return { ...state, videoGroups: newGroups };
+            return { ...state, videoGroups: newVideoGroups };
 
         case 'REMOVE_VIDEO':
             const deletedVideoGroup = state.videoGroups.map( group => 
@@ -44,7 +58,21 @@ function videoReducer(state, action) {
             return {...state, videoGroups: deletedVideoGroup};
         
         case 'ADD_AUDIO':
-            return {...state, audioClips: [...state.audioClips, ...action.payload]};
+            const { audios, groupId: groupIdAudio  } = action.payload;
+            const newAudioGroups = state.audioGroups.map((group) =>
+                group.id === groupIdAudio
+                    ? { ...group, audios: [...group.audios, ...audios].sort((a, b) => a.timestamp - b.timestamp) }
+                    : group
+            );
+            return { ...state, audioGroups: newAudioGroups };
+
+        case 'REMOVE_AUDIO':
+            const deletedAudioGroup = state.audioGroups.map( group => 
+                group.id === action.payload.groupId 
+                ? { ...group, audios : group.audios.filter( v => v.id !== action.payload.audioId)} :
+                group
+            );
+            return {...state, audioGroups: deletedAudioGroup};
 
         case 'SET_TIME':
             return {...state, currentTime: action.payload};
