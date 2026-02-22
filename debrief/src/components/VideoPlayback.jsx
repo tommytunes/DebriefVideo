@@ -112,7 +112,7 @@ const VideoPlayback = () => {
             src={video1.url}
             className="w-full h-full object-contain"
             preload='auto'
-            muted
+            muted={group1.muted}
             />
         </div>
 
@@ -132,7 +132,7 @@ const VideoPlayback = () => {
             src={video2.url}
             className="w-full h-full object-contain"
             preload='auto'
-            muted
+            muted={group2.muted}
             />
         </div> :
 

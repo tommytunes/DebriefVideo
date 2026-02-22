@@ -38,7 +38,7 @@ const VideoSource = () => {
 
 
     return (
-        <>
+        <div className="flex flex-col">
         <div className="card card-border w-100 m-10">
             <div className="card-body">
                 <h1 className="card-title text-2xl font-bold">Video Source</h1>
@@ -83,7 +83,7 @@ const VideoSource = () => {
                 }
 
             
-        </>
+        </div>
     );
 }
 

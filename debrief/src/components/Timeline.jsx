@@ -84,11 +84,11 @@ export const TimelineEditor = () => {
     }
     
     return (
-        <div className='timeline-editor-example1' ref={containerRef}>
+        <div className='timeline-editor-example1 flex-1 min-w-0' ref={containerRef}>
             <Timeline
             ref={timelineRef}
             editorData={data}
-            onChange={setData}
+            onChange={setData} 
             effects={timelineEffects}
             hideCursor={false}
             autoScroll={false}

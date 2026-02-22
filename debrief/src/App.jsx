@@ -5,11 +5,12 @@ import VideoSource from "./components/VideoSource";
 import NavBar from "./components/NavBar";
 import TimelineEditor from "./components/Timeline";
 import VideoGroupSelection from "./components/VideoGroupSelection";
+import ListMedia from "./components/ListMedia"
+import AudioSource from "./components/AudioSource";
 import {Routes, Route} from "react-router-dom";
 
 
 function App() {
-  //      <Route path="/" element={<><VideoGroupSelection></VideoGroupSelection><VideoPlayback /><PlaybackControl /><TimelineEditor /></>} />
 
   return (
     <div className="flex flex-col h-screen">
@@ -20,14 +21,23 @@ function App() {
       <div className="flex-1">
         <VideoGroupSelection />
         <VideoPlayback />
-        
       </div>
-        <PlaybackControl />
-        <TimelineEditor />
+       <div className="flex flex-row">
+        <div className="flex flex-col bg-gray-400">
+          <PlaybackControl />
+          <ListMedia />   
+        </div>                                                                                                                                                                                                                                                      
+        <TimelineEditor />                                                                                                                                    
+      </div> 
+        
         </>
       } />
 
-      <Route path="/files" element={<><VideoSource /></>} />
+      <Route path="/files" element={
+      <div className="flex flex-row">
+        <VideoSource />
+        <AudioSource />
+      </div>} />
     </Routes>
     </div>
   )
