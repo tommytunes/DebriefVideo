@@ -21,18 +21,18 @@ export const TimelineEditor = () => {
     const [scaleWidth, setScaleWidth] = useState(160);
 
     const timelineStart = useMemo(
-          () => FindTimelineStart(state.videoGroups),
-          [state.videoGroups]
+          () => FindTimelineStart(state.videoGroups, state.audioGroups),
+          [state.videoGroups, state.audioGroups]
       );
 
     const timelineEffects = useMemo(
-        () => TimelineEffects(state.videoGroups),
-        [state.videoGroups]
+        () => TimelineEffects(state.videoGroups, state.audioGroups),
+        [state.videoGroups, state.audioGroups]
     );
 
     const timelineData = useMemo(
-        () => VideoToTimelineData(state.videoGroups, timelineStart),
-        [state.videoGroups, timelineStart]
+        () => VideoToTimelineData(state.videoGroups, state.audioGroups, timelineStart),
+        [state.videoGroups, timelineStart, state.audioGroups]
     );
 
     const [data, setData] = useState(timelineData);
@@ -65,7 +65,7 @@ export const TimelineEditor = () => {
 
     useEffect(() => {
         if (containerWidth === 0 || state.videoGroups.length === 0) return;
-        const timelineEnd = FindTimelineEnd(state.videoGroups);
+        const timelineEnd = FindTimelineEnd(state.videoGroups, state.audioGroups);
         const scaleVal = ((timelineEnd - timelineStart) / ((containerWidth - startLeftVal) / scaleWidth) / 1000);
         setScale(scaleVal);
     }, [state.videoGroups, containerWidth, startLeftVal, scaleWidth])

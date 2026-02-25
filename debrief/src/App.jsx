@@ -7,6 +7,7 @@ import TimelineEditor from "./components/Timeline";
 import VideoGroupSelection from "./components/VideoGroupSelection";
 import ListMedia from "./components/ListMedia"
 import AudioSource from "./components/AudioSource";
+import AudioPlayback from "./components/AudioPlayback";
 import {Routes, Route} from "react-router-dom";
 
 
@@ -21,6 +22,7 @@ function App() {
       <div className="flex-1">
         <VideoGroupSelection />
         <VideoPlayback />
+        <AudioPlayback />
       </div>
        <div className="flex flex-row">
         <div className="flex flex-col bg-gray-400">

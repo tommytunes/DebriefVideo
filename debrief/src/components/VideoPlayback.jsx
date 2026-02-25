@@ -2,7 +2,7 @@ import { useVideo } from '../contexts/VideoContext';
 import { FindActiveVideo } from '../utils/FindActiveVideo';
 import { FindTimelineStart } from '../utils/FindTimelineStart';
 import { usePlayback } from '../hooks/usePlayback';
-import { useRef, useEffect,  useLayoutEffect, useEffectEvent } from 'react';
+import { useRef, useEffect } from 'react';
 import { useMasterClock } from '../hooks/useMasterClock';
 
 const VideoPlayback = () => {
@@ -11,7 +11,7 @@ const VideoPlayback = () => {
     const videoRef1 = useRef(null);
     const videoRef2 = useRef(null);
 
-    const timelineStart = FindTimelineStart(state.videoGroups);
+    const timelineStart = FindTimelineStart(state.videoGroups, state.audioGroups);
 
     const group1 = state.videoGroups.find(group => group.id === state.groupIdVideo1);
     const group2 = state.videoGroups.find(group => group.id === state.groupIdVideo2);
@@ -85,15 +85,16 @@ const VideoPlayback = () => {
 
     // Effect 4: Paused scrubbing — set currentTime directly when not playing
     useEffect(() => {
-        if (isPlaying) return;
+        if (isPlaying && !state.isSeeking.seeking) return;
 
         if (videoRef1.current && video1) videoRef1.current.currentTime = offsetInVideo1;
         if (videoRef2.current && video2) videoRef2.current.currentTime = offsetInVideo2;
         dispatch({type: 'SET_SEEKING', payload: false});
 
-    }, [isPlaying, offsetInVideo1, offsetInVideo2]);
+    }, [isPlaying, offsetInVideo1, offsetInVideo2, state.isSeeking.id]);
 
     // Effect 5: Seeking 
+    /*
     useEffect(() => {
         if (!state.isSeeking.seeking) return;
 
@@ -101,7 +102,7 @@ const VideoPlayback = () => {
         if (videoRef2.current && video2) videoRef2.current.currentTime = offsetInVideo2;
         dispatch({type: 'SET_SEEKING', payload: false});
     }, [state.isSeeking.id]);
-    
+    */
 
     return (
         <div className='flex gap-4'>

@@ -49,6 +49,14 @@ function videoReducer(state, action) {
                 group
             );
             return { ...state, videoGroups: newMutedGroups };
+
+        case 'INVERT_MUTE_AUDIO':
+            const newMutedGroupsAudio = state.audioGroups.map( group => 
+                group.id === action.payload
+                ? { ...group, muted: !group.muted} :
+                group
+            );
+            return { ...state, audioGroups: newMutedGroupsAudio };
         
         case 'ADD_VIDEO':
             const { videos, groupId: groupIdVideo } = action.payload;
@@ -91,7 +99,10 @@ function videoReducer(state, action) {
             return {...state, isPlaying: action.payload};
 
         case 'SET_SEEKING':
-            return {...state, isSeeking: {seeking: action.payload, id: state.isSeeking.id + 1}};
+            if (action.payload) {
+                return {...state, isSeeking: {seeking: action.payload, id: state.isSeeking.id + 1}};
+            }
+            return {...state, isSeeking: {seeking: false, id: state.isSeeking.id}};
 
         case 'INCREMENT_TIME':
             return {...state, currentTime: state.currentTime + action.payload};

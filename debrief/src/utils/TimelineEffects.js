@@ -1,11 +1,16 @@
 
 
-export function TimelineEffects(videoGroups) {
-    if (videoGroups.length === 0) return {};
+export function TimelineEffects(videoGroups, audioGroups) {
+    if (videoGroups.length === 0 && audioGroups.length === 0) return {};
 
-    const effects = Object.fromEntries(videoGroups.map( group => [
+    const effectsVideo = Object.fromEntries(videoGroups.map( group => [
         group.id, { id : group.id, name: group.name}
     ]));
 
-    return effects;
+    const effectsAudio = Object.fromEntries(audioGroups.map( group => [
+        group.id, { id : group.id, name: group.name }
+    ]));
+
+
+    return {...effectsVideo, ...effectsAudio};
 };

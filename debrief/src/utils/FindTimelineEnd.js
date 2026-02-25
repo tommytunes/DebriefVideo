@@ -1,17 +1,27 @@
 
-export function FindTimelineEnd(groups) {
-    if (groups.length === 0) return 0;
+export function FindTimelineEnd(videoGroups, audioGroups) {
+    if (videoGroups.length === 0 && audioGroups === 0) return 0;
 
-    let latestVideo = 0;
+    let latest = 0;
 
-    groups.forEach( group => {
+    videoGroups.forEach( group => {
         if (group.videos.length === 0) return;
         group.videos.forEach( video => {
             const videoTime =  video.timestamp.getTime() + video.duration * 1000;
-            if (videoTime > latestVideo) {
-                latestVideo = videoTime;
+            if (videoTime > latest) {
+                latest = videoTime;
             }
         })
     })
-    return latestVideo;
+
+    audioGroups.forEach( group => {
+        if (group.audios.length === 0) return;
+        group.audios.forEach( audio => {
+            const audioTime =  audio.timestamp.getTime() + audio.duration * 1000;
+            if (audioTime > latest) {
+                latest = audioTime;
+            }
+        })
+    })
+    return latest;
 }
