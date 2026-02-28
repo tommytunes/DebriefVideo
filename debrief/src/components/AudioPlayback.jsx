@@ -11,9 +11,22 @@ const AudioPlayback = () => {
     const timelineStart = FindTimelineStart(state.videoGroups, state.audioGroups);
     const audioRefs = useRef({});
     const { isPlaying } = usePlayback();
+    const currentTimeRef = useRef(state.currentTime);
+    const isSeekingRef = useRef(state.isSeeking.seeking);
+    const audioGroupsRef = useRef(state.audioGroups);
+    const timelineStartRef = useRef(timelineStart);
+    const isPlayingRef = useRef(isPlaying);
+
+   
+
+    currentTimeRef.current = state.currentTime;
+    isSeekingRef.current = state.isSeeking.seeking;
+    audioGroupsRef.current = state.audioGroups;
+    timelineStartRef.current = timelineStart;
+    isPlayingRef.current = isPlaying
     
     const activeAudioIds = state.audioGroups.map(group => {
-      const { audio } = FindActiveAudio(group, state.currentTime, timelineStart);
+      const { audio } = FindActiveAudio(group, currentTimeRef.current, timelineStartRef.current);
       return audio?.id;
     });
 
@@ -22,7 +35,7 @@ const AudioPlayback = () => {
         
             state.audioGroups.forEach( group => {
                     if (isPlaying) {
-                        const { audio, isGap, offsetInAudio } = FindActiveAudio(group, state.currentTime, timelineStart);
+                        const { audio, isGap, offsetInAudio } = FindActiveAudio(group, currentTimeRef.current, timelineStartRef.current);
                         if (audioRefs.current[group.id] && !isGap) {
                             audioRefs.current[group.id].currentTime = offsetInAudio;
                             audioRefs.current[group.id].play().catch(() => {});
@@ -33,37 +46,37 @@ const AudioPlayback = () => {
                     }
             })
         
-    }, [isPlaying]);
+    }, [isPlayingRef.current]);
     // Effect 2: Audio 1 transition — hard seek when active clip changes
     useEffect(() => {
         state.audioGroups.forEach( group => {
-                const { audio, isGap, offsetInAudio } = FindActiveAudio(group, state.currentTime, timelineStart);
+                const { audio, isGap, offsetInAudio } = FindActiveAudio(group, currentTimeRef.current, timelineStartRef.current);
 
                 if (!audioRefs.current[group.id] || !audio) return;
 
                 audioRefs.current[group.id].currentTime = offsetInAudio;
 
-                if (isPlaying && !isGap) {
+                if (isPlayingRef.current && !isGap) {
                     audioRefs.current[group.id].play().catch(() => {});
                 }
         })
     }, [activeAudioIds.join(',')]);
     // Effect 3: Paused scrubbing — set currentTime directly when not playing
     useEffect(() => {
-        if (isPlaying && !state.isSeeking.seeking) return;
+        if (isPlayingRef.current && !isSeekingRef.current) return;
 
         state.audioGroups.forEach( group => {
-                const { audio, isGap, offsetInAudio } = FindActiveAudio(group, state.currentTime, timelineStart);
+                const { audio, isGap, offsetInAudio } = FindActiveAudio(group, currentTimeRef.current, timelineStartRef.current);
 
                 if (audioRefs.current[group.id] && audio) audioRefs.current[group.id].currentTime = offsetInAudio;
                 dispatch({type: 'SET_SEEKING', payload: false});
         })
-    }, [isPlaying, state.isSeeking.id]);
+    }, [isPlayingRef.current, state.isSeeking.id]);
 
  return (
         <>
         {state.audioGroups.map(group => {
-        const { audio } = FindActiveAudio(group, state.currentTime, timelineStart);
+        const { audio } = FindActiveAudio(group, currentTimeRef.current, timelineStartRef.current);
         return (
             <div key={group.id}>
             {audio && <audio 

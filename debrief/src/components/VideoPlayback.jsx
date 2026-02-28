@@ -12,6 +12,8 @@ const VideoPlayback = () => {
     const videoRef2 = useRef(null);
 
     const timelineStart = FindTimelineStart(state.videoGroups, state.audioGroups);
+    const timelineStartRef = useRef(timelineStart);
+    const isSeekingRef = useRef(state.isSeeking.seeking);
 
     const group1 = state.videoGroups.find(group => group.id === state.groupIdVideo1);
     const group2 = state.videoGroups.find(group => group.id === state.groupIdVideo2);
@@ -37,7 +39,7 @@ const VideoPlayback = () => {
         {videoRef: videoRef2, isGap: isGap2, videoTimestamp: video2?.timestamp }
     ].sort( (a, b) => a.videoTimestamp - b.videoTimestamp);
 
-    useMasterClock(state.isPlaying, dispatch, timelineStart, clockSourcesRef);
+    useMasterClock(state.isPlaying, dispatch, timelineStartRef, clockSourcesRef, isSeekingRef);
 
     // Effect 1: Play/Pause — seek to correct position then play, or pause
     useEffect(() => {
@@ -93,17 +95,7 @@ const VideoPlayback = () => {
 
     }, [isPlaying, offsetInVideo1, offsetInVideo2, state.isSeeking.id]);
 
-    // Effect 5: Seeking 
-    /*
-    useEffect(() => {
-        if (!state.isSeeking.seeking) return;
-
-        if (videoRef1.current && video1) videoRef1.current.currentTime = offsetInVideo1;
-        if (videoRef2.current && video2) videoRef2.current.currentTime = offsetInVideo2;
-        dispatch({type: 'SET_SEEKING', payload: false});
-    }, [state.isSeeking.id]);
-    */
-
+    
     return (
         <div className='flex gap-4'>
         {!isGap1 && video1 ?

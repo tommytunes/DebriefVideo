@@ -1,6 +1,6 @@
 import MediaDropZone from "./MediaDropZone";
 import { useVideo } from '../contexts/VideoContext';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { extractMetaDataVideo } from '../utils/MetaData';
 
 
@@ -9,6 +9,14 @@ const VideoSource = () => {
     const { state, dispatch } = useVideo();
 
     const [inputValue, setInputValue] = useState('');
+    const [customTimeStamp, setCustomTimeStamp] = useState({});
+
+    const toggleTimestampInput = (videoId) => {
+        setCustomTimeStamp(prev => ({
+            ...prev,
+            [videoId]: !prev[videoId]
+        }));
+    };
 
     const handleChange = (e) => {
         setInputValue(e.target.value);
@@ -26,6 +34,10 @@ const VideoSource = () => {
 
     const handleDeleteVideo = (groupId, videoId) => {
         dispatch({type: 'REMOVE_VIDEO', payload: {groupId: groupId, videoId: videoId}});
+    };
+
+    const handleTimeStamp = (groupId, videoId, newTimestamp) => {
+        dispatch({type: 'SET_TIMESTAMP_VIDEO', payload: {videoGroupId: groupId, videoId: videoId, newVideoTimeStamp: new Date(newTimestamp)}});
     };
 
     const onFilesVideo = async (files, handles, groupId) => {
@@ -66,7 +78,14 @@ const VideoSource = () => {
                                         <div>
                                             <li className="list-col-grow">{video.file.name}</li>
                                             <p className="text-xs">{video.timestamp.toLocaleTimeString()}</p>
+                                            <button className="btn btn-xs" onClick={() => toggleTimestampInput(video.id)}>Custom TimeStamp</button>
+                                            {
+                                                customTimeStamp[video.id] &&
+                                                <input className="input" type="datetime-local" step="1" onChange={(e) => handleTimeStamp(group.id, video.id, e.target.value)}/>
+                                            }
                                         </div>
+                                        
+                                        
                                         <button onClick={() => handleDeleteVideo(group.id, video.id)} className=" btn btn-sm">Delete</button>
                                     </div>
                                 ))}

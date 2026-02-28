@@ -49,7 +49,7 @@ function videoReducer(state, action) {
                 group
             );
             return { ...state, videoGroups: newMutedGroups };
-
+        
         case 'INVERT_MUTE_AUDIO':
             const newMutedGroupsAudio = state.audioGroups.map( group => 
                 group.id === action.payload
@@ -92,6 +92,32 @@ function videoReducer(state, action) {
             );
             return {...state, audioGroups: deletedAudioGroup};
 
+        case 'SET_TIMESTAMP_VIDEO':
+            const {videoGroupId, videoId, newVideoTimeStamp} = action.payload;
+            const newVideoTimeStampGroups = state.videoGroups.map( group =>
+                group.id === videoGroupId
+                ? {...group, videos: group.videos.map( video => 
+                    video.id === videoId ?
+                    {...video, timestamp: newVideoTimeStamp} :
+                    video
+                )} : group
+            );
+
+            return {...state, videoGroups: newVideoTimeStampGroups};
+        
+        case 'SET_TIMESTAMP_AUDIO':
+            const {audioGroupId, audioId, newAudioTimeStamp} = action.payload;
+            const newAudioTimeStampGroups = state.audioGroups.map( group =>
+                group.id === audioGroupId
+                ? {...group, audios: group.audios.map( audio => 
+                    audio.id === audioId ?
+                    {...audio, timestamp: newAudioTimeStamp} :
+                    audio
+                )} : group
+            );
+
+            return {...state, audioGroups: newAudioTimeStampGroups};
+        
         case 'SET_TIME':
             return {...state, currentTime: action.payload};
 
@@ -112,6 +138,21 @@ function videoReducer(state, action) {
         
         case 'SET_VIDEO2':
             return {...state, groupIdVideo2: action.payload};
+
+        case 'TIMESTAMPS_AUDIO':
+            const { groupId, timeStamp, offsetTimestamp } = action.payload;
+            
+            const accurateTimeStamp = timeStamp.getTime() - offsetTimestamp * 1000;
+            
+            const delayedTimeStampsGroups = state.audioGroups.map( group =>
+                group.id === groupId
+                ? {...group, audios: group.audios.map( (audio, index) => {
+                    const precedingMs = group.audios.slice(0, index).reduce((sum, a) => sum + a.duration, 0) * 1000;
+                    return {...audio, timestamp: new Date(accurateTimeStamp + precedingMs)};
+                }                
+                )} : group
+            );
+            return {...state, audioGroups: delayedTimeStampsGroups};
         
         default:
             return state;

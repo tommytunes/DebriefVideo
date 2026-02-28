@@ -1,12 +1,10 @@
 import { useRef, useEffect } from 'react';
 import { useVideo } from '../contexts/VideoContext';
 
-export function useMasterClock(isPlaying, dispatch, timelineStart, clockSources) {
+export function useMasterClock(isPlaying, dispatch, timelineStartRef, clockSources, isSeekingRef) {
 
     const rafId = useRef(null);
-    const lastRafId = useRef(null);
-    const { state } = useVideo();
-    
+    const lastRafId = useRef(null);    
 
     useEffect(() => {
     if (!isPlaying) {
@@ -30,10 +28,10 @@ export function useMasterClock(isPlaying, dispatch, timelineStart, clockSources)
             }
         }
         
-        if (!state.isSeeking.seeking) {
+        if (!isSeekingRef.current) {
             if (clockVideo) {
             lastRafId.current = now;
-            const globalTime = (clockVideo.videoTimestamp.getTime() + clockVideo.videoRef.current.currentTime * 1000 - timelineStart) / 1000;
+            const globalTime = (clockVideo.videoTimestamp.getTime() + clockVideo.videoRef.current.currentTime * 1000 - timelineStartRef.current) / 1000;
             dispatch({type: 'SET_TIME', payload: globalTime});
             }
 

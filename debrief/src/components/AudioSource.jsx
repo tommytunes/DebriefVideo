@@ -9,6 +9,19 @@ const AudioSource = () => {
     const { state, dispatch } = useVideo();
 
     const [inputValue, setInputValue] = useState('');
+    const [customTimeStamp, setCustomTimeStamp] = useState({});
+    const [newTimeStamp, setNewTimeStamp] = useState();
+    
+    const toggleTimestampInput = (audioId) => {
+        setCustomTimeStamp(prev => ({
+            ...prev,
+            [audioId]: !prev[audioId]
+        }));
+    };
+
+    const handleTimeStamp = (groupId, audioId, newTimestamp) => {
+        dispatch({type: 'SET_TIMESTAMP_AUDIO', payload: {audioGroupId: groupId, audioId: audioId, newAudioTimeStamp: new Date(newTimestamp)}});
+    };
 
     const handleChange = (e) => {
         setInputValue(e.target.value);
@@ -27,6 +40,10 @@ const AudioSource = () => {
     const handleDeleteAudio = (groupId, audioId) => {
         dispatch({type: 'REMOVE_AUDIO', payload: {groupId: groupId, audioId: audioId}});
     };
+
+    const handleDelayedTimeStamp = (groupId, timeStamp, offsetTimestamp) => {
+        dispatch({type: 'TIMESTAMPS_AUDIO', payload: {groupId, timeStamp, offsetTimestamp}});
+    }
 
     const onFilesAudio = async (files, handles, groupId) => {
         const audios = await Promise.all(files.map(async file => {
@@ -59,6 +76,14 @@ const AudioSource = () => {
                             <h1 className="font-bold">{group.name}</h1>
                             <div>
                                 <button onClick={() => handleDeleteGroup(group.id)} className="btn btn-sm">Delete Group</button>
+                                
+                            </div>
+                            <div className="flex flex-col">
+                                <p>Input Custom TimeStamp for All:</p>
+                                <div className="flex flex-row">
+                                    <input type="datetime-local" step="1" className="input" onChange={e => setNewTimeStamp(new Date(e.target.value))}/>
+                                    <input type="number" className="input" onChange={e => handleDelayedTimeStamp(group.id, newTimeStamp, e.target.value)}/>
+                                </div>
                             </div>
                             <ul className="list">
                                 {group.audios.map( (audio) => (
@@ -66,6 +91,11 @@ const AudioSource = () => {
                                         <div>
                                             <li className="list-col-grow">{audio.file.name}</li>
                                             <p className="text-xs">{audio.timestamp.toLocaleTimeString()}</p>
+                                            <button className="btn btn-xs" onClick={() => toggleTimestampInput(audio.id)}>Custom TimeStamp</button>
+                                            {
+                                                customTimeStamp[audio.id] &&
+                                                <input className="input" type="datetime-local" step="1" onChange={(e) => handleTimeStamp(group.id, audio.id, e.target.value)}/>
+                                            }
                                         </div>
                                         <button onClick={() => handleDeleteAudio(group.id, audio.id)} className=" btn btn-sm">Delete</button>
                                     </div>

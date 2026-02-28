@@ -52,7 +52,6 @@ const PlaybackControl = () => {
             {!isPlaying ?
                 <button onClick={play} className="px-4 py-2"><img src={Play} /></button> :
                 <button onClick={pause} className="px-4 py-2"><img src={Pause} /></button>
-                
             } 
         </div>
     )

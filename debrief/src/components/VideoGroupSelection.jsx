@@ -36,7 +36,6 @@ const VideoGroupSelection = () => {
                     </select>
                 </label>
             </div>
-                
             </div>
         
         
