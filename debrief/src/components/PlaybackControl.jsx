@@ -30,12 +30,34 @@ const PlaybackControl = () => {
             }
             if (event.code === "ArrowLeft") {
                 event.preventDefault();
-                seekRef.current(currentTimeRef.current - 5);
+                seekRef.current(currentTimeRef.current - 1);
             }
 
             if (event.code === "ArrowRight") {
                 event.preventDefault();
-                seekRef.current(currentTimeRef.current + 5);
+                seekRef.current(currentTimeRef.current + 1);
+            }
+
+            if (event.code === "KeyA") {
+                event.preventDefault();
+                seekRef.current(currentTimeRef.current - 60);
+
+            }
+
+            if (event.code === "KeyD") {
+                event.preventDefault();
+                seekRef.current(currentTimeRef.current + 60);
+            }
+
+            if (event.code === "KeyZ") {
+                event.preventDefault();
+                seekRef.current(currentTimeRef.current - 10);
+
+            }
+
+            if (event.code === "KeyC") {
+                event.preventDefault();
+                seekRef.current(currentTimeRef.current + 10);
             }
         }
         window.addEventListener("keydown", handleKeyDown);

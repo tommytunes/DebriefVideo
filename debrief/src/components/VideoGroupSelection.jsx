@@ -8,7 +8,7 @@ const VideoGroupSelection = () => {
     const handleOnChangeVideo2 = (e) => {dispatch({type: 'SET_VIDEO2', payload: e.target.value})};
 
     return( // TODO add state of current group selected
-        <div className="flex flex-row">
+        <div className="flex flex-col">
         <div className="p-2">
             <label>
                 Choose Video Source 1: 
@@ -23,7 +23,7 @@ const VideoGroupSelection = () => {
             </label>
             </div>
 
-            <div className="p-2 ml-90">
+            <div className="p-2">
                 <label>
                 Choose Video Source 2: 
                     <select onChange={handleOnChangeVideo2}>

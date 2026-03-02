@@ -82,6 +82,11 @@ export const TimelineEditor = () => {
         seek(time);
         timelineRef.current.setTime(time);
     }
+
+    const CursorDrag = (time) => {
+        seek(time);
+        timelineRef.current.setTime(time);
+    }
     
     return (
         <div className='timeline-editor-example1 flex-1 min-w-0' ref={containerRef}>
@@ -93,10 +98,11 @@ export const TimelineEditor = () => {
             hideCursor={false}
             autoScroll={false}
             getScaleRender={getScaleRender}
-            startLeft={startLeftVal} // remove maybe once list is added
+            startLeft={startLeftVal}
             scale={scale}
             scaleWidth={scaleWidth}
             onClickTimeArea={ClickCursor}
+            onCursorDrag={CursorDrag}
             />
         </div>
 

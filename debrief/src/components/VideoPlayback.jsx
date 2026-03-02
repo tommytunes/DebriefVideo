@@ -2,7 +2,7 @@ import { useVideo } from '../contexts/VideoContext';
 import { FindActiveVideo } from '../utils/FindActiveVideo';
 import { FindTimelineStart } from '../utils/FindTimelineStart';
 import { usePlayback } from '../hooks/usePlayback';
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { useMasterClock } from '../hooks/useMasterClock';
 
 const VideoPlayback = () => {
@@ -10,6 +10,27 @@ const VideoPlayback = () => {
     const { currentTime, isPlaying } = usePlayback();
     const videoRef1 = useRef(null);
     const videoRef2 = useRef(null);
+
+    const containerRef = useRef(null);
+    const [splitRatio, setSplitRatio] = useState(0.5);
+    const isDragging = useRef(false);
+    const SNAP_THRESHOLD = 0.15;
+
+    const handlePointerDown = (e) => {
+        isDragging.current = true;
+        e.currentTarget.setPointerCapture(e.pointerId);
+    };
+
+    const handlePointerMove = (e) => {
+        if (!isDragging.current) return;
+        const rect = containerRef.current.getBoundingClientRect();
+        const ratio = (e.clientX - rect.left) / rect.width;
+        const clamped = Math.max(0, Math.min(1, ratio));
+
+       setSplitRatio(clamped);
+    };
+
+    const handlePointerUp = () => { isDragging.current = false; };
 
     const timelineStart = FindTimelineStart(state.videoGroups, state.audioGroups);
     const timelineStartRef = useRef(timelineStart);
@@ -95,11 +116,11 @@ const VideoPlayback = () => {
 
     }, [isPlaying, offsetInVideo1, offsetInVideo2, state.isSeeking.id]);
 
-    
+
     return (
-        <div className='flex gap-4'>
-        {!isGap1 && video1 ?
-        <div key="video1" className="w-[640px] h-[360px] bg-black overflow-hidden">
+        <div className='flex h-[100%]' ref={containerRef} onPointerMove={handlePointerMove} onPointerUp={handlePointerUp}>
+        {(!isGap1 && video1) && (splitRatio > 0) ?
+        <div key="video1" className="h-full w-full bg-black overflow-hidden" style={{width: `${splitRatio * 100}%`}}>
             <video
             ref={videoRef1}
             src={video1.url}
@@ -111,15 +132,20 @@ const VideoPlayback = () => {
 
         :
 
-        <div key="gap1" className="w-[640px] h-[360px] bg-black overflow-hidden">
+        <div key="gap1" className="h-full w-full bg-black overflow-hidden" style={{width: `${splitRatio * 100}%`}}>
             <video
             className="w-full h-full object-contain"
             />
         </div>
         }
 
-        {!isGap2 && video2 ?
-        <div key="video2" className="w-[640px] h-[360px] bg-black overflow-hidden">
+        
+        <div className="w-2 bg-gray-600 hover:bg-blue-500 cursor-col-resize flex-shrink-0"
+               onPointerDown={handlePointerDown} />
+        
+
+        {(!isGap2 && video2) && (splitRatio < 1) ?
+        <div key="video2" className="h-full w-full bg-black overflow-hidden" style={{width: `${(1 - splitRatio) * 100}%`}}>
             <video
             ref={videoRef2}
             src={video2.url}
@@ -129,7 +155,8 @@ const VideoPlayback = () => {
             />
         </div> :
 
-        <div key="gap2" className="w-[640px] h-[360px] bg-black overflow-hidden">
+        
+        <div key="gap2" className="h-full w-full bg-black overflow-hidden" style={{width: `${(1 - splitRatio) * 100}%`}}>
             <video
             className="w-full h-full object-contain"
             />

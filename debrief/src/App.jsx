@@ -4,7 +4,6 @@ import PlaybackControl  from "./components/PlaybackControl";
 import VideoSource from "./components/VideoSource";
 import NavBar from "./components/NavBar";
 import TimelineEditor from "./components/Timeline";
-import VideoGroupSelection from "./components/VideoGroupSelection";
 import ListMedia from "./components/ListMedia"
 import AudioSource from "./components/AudioSource";
 import AudioPlayback from "./components/AudioPlayback";
@@ -19,8 +18,8 @@ function App() {
     <Routes>
       <Route path="/" element={
       <>
-      <div className="flex-1">
-        <VideoGroupSelection />
+      <div className="flex-1 min-h-0">
+        
         <VideoPlayback />
         <AudioPlayback />
       </div>
