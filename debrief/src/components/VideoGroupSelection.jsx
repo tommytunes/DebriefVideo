@@ -17,7 +17,7 @@ const VideoGroupSelection = () => {
                     {state.videoGroups.length === 0 ? 
                     <option>No Video Group Created</option> :
                     state.videoGroups.map( group => (
-                        <option value={group.id}>{group.name}</option>
+                        <option key={group.id} value={group.id}>{group.name}</option>
                     ))}
                 </select>
             </label>
@@ -31,7 +31,7 @@ const VideoGroupSelection = () => {
                         {state.videoGroups.length === 0 ? 
                         <option>No Video Group Created</option> :
                         state.videoGroups.map( group => (
-                            <option value={group.id}>{group.name}</option>
+                            <option key={group.id} value={group.id}>{group.name}</option>
                         ))}
                     </select>
                 </label>

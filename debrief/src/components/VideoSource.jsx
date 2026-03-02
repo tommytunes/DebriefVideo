@@ -72,11 +72,11 @@ const VideoSource = () => {
                             <div>
                                 <button onClick={() => handleDeleteGroup(group.id)} className="btn btn-sm">Delete Group</button>
                             </div>
-                            <ul className="list">
+                            <ul key={group.id} className="list">
                                 {group.videos.map( (video) => (
                                     <div key={video.id} className="list-row">
                                         <div>
-                                            <li className="list-col-grow">{video.file.name}</li>
+                                            <li key={video.id} className="list-col-grow">{video.file.name}</li>
                                             <p className="text-xs">{video.timestamp.toLocaleTimeString()}</p>
                                             <button className="btn btn-xs" onClick={() => toggleTimestampInput(video.id)}>Custom TimeStamp</button>
                                             {

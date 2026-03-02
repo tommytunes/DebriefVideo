@@ -4,6 +4,8 @@ import { FindTimelineStart } from '../utils/FindTimelineStart';
 import { usePlayback } from '../hooks/usePlayback';
 import { useRef, useEffect, useState } from 'react';
 import { useMasterClock } from '../hooks/useMasterClock';
+import VideoOverlay from './VideoOverlay';
+import { Video } from 'lucide-react';
 
 const VideoPlayback = () => {
     const { state, dispatch } = useVideo();
@@ -120,7 +122,7 @@ const VideoPlayback = () => {
     return (
         <div className='flex h-[100%]' ref={containerRef} onPointerMove={handlePointerMove} onPointerUp={handlePointerUp}>
         {(!isGap1 && video1) && (splitRatio > 0) ?
-        <div key="video1" className="h-full w-full bg-black overflow-hidden" style={{width: `${splitRatio * 100}%`}}>
+        <div key="video1" className="relative h-full w-full bg-black overflow-hidden" style={{width: `${splitRatio * 100}%`}}>
             <video
             ref={videoRef1}
             src={video1.url}
@@ -128,6 +130,7 @@ const VideoPlayback = () => {
             preload='auto'
             muted={group1.muted}
             />
+            <VideoOverlay />
         </div>
 
         :

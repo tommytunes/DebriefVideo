@@ -3,6 +3,7 @@ import { createContext, useContext, useReducer } from "react";
 const initialState = {
     videoGroups: [],
     audioGroups: [],
+    dataGroups: [],
     currentTime: 0,
     isPlaying: false,
     isSeeking: {seeking: false, id: 0},
@@ -42,6 +43,20 @@ function videoReducer(state, action) {
             );
             return {...state, audioGroups: deleteAudioGroups };
         
+        case 'ADD_DATA_GROUP':
+            return {...state, dataGroups:[...state.dataGroups, {
+                id: crypto.randomUUID(),
+                name: action.payload,
+                data: []
+            }
+            ]};
+        
+        case 'DELETE_DATA_GROUP':
+            const deletedDataGroups = state.dataGroups.filter(group =>
+                group.id !== action.payload
+            );
+            return {...state, dataGroups: deletedDataGroups };
+
         case 'INVERT_MUTE_VIDEO':
             const newMutedGroups = state.videoGroups.map( group => 
                 group.id === action.payload

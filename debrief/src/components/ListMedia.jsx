@@ -16,7 +16,7 @@ const ListMedia = () => {
     return (
     <>
         {state.videoGroups.map(group => (
-            <button className='btn btn-primary btn-sm m-0.5' onClick={() => onClickVideo(group)}>
+            <button key={group.id} className='btn btn-primary btn-sm m-0.5' onClick={() => onClickVideo(group)}>
                 {group.name}
                 {group.muted ? 
                 <img src={Muted}  className='ml-auto'/> :
@@ -24,7 +24,7 @@ const ListMedia = () => {
                 </button>
         )) }
         {state.audioGroups.map(group => (
-            <button className='btn btn-primary btn-sm m-0.5' onClick={() => onClickAudio(group)}>
+            <button key={group.id} className='btn btn-primary btn-sm m-0.5' onClick={() => onClickAudio(group)}>
                 {group.name}
                 {group.muted ? 
                 <img src={Muted} className='ml-auto'/> :

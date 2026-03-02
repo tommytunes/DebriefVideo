@@ -10,12 +10,19 @@ const AudioSource = () => {
 
     const [inputValue, setInputValue] = useState('');
     const [customTimeStamp, setCustomTimeStamp] = useState({});
-    const [newTimeStamp, setNewTimeStamp] = useState();
+    const [newTimeStamp, setNewTimeStamp] = useState({});
     
     const toggleTimestampInput = (audioId) => {
         setCustomTimeStamp(prev => ({
             ...prev,
             [audioId]: !prev[audioId]
+        }));
+    };
+
+    const handleNewTimeStamp = (timestamp, groupId) => {
+        setNewTimeStamp(prev => ({
+            ...prev,
+            [groupId]: timestamp
         }));
     };
 
@@ -79,10 +86,13 @@ const AudioSource = () => {
                                 
                             </div>
                             <div className="flex flex-col">
-                                <p>Input Custom TimeStamp for All:</p>
+                                <p>Date + offset in video:</p>
                                 <div className="flex flex-row">
-                                    <input type="datetime-local" step="1" className="input" onChange={e => setNewTimeStamp(new Date(e.target.value))}/>
-                                    <input type="number" className="input" onChange={e => handleDelayedTimeStamp(group.id, newTimeStamp, e.target.value)}/>
+                                    <input type="datetime-local" step="1" className="input" onChange={e => handleNewTimeStamp(new Date(e.target.value), group.id)}/>
+                                    {newTimeStamp[group.id] && 
+                                        <input type="number" className="input" onChange={e => handleDelayedTimeStamp(group.id, newTimeStamp[group.id], e.target.value)}/>
+                                    }
+                                    
                                 </div>
                             </div>
                             <ul className="list">
