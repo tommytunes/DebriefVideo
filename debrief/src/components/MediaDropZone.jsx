@@ -3,13 +3,13 @@ import React, {useCallback} from 'react'
 import {useDropzone} from 'react-dropzone'
 import { extractMetaDataVideo } from '../utils/MetaData';
 
-function MediaDropZone({ groupId, accept, label, onFiles }) {
+function MediaDropZone({ groupId, accept, label, onFiles, multiple = true }) {
 
   const onClick = async () => {                                                                                                                       
           const handles = await window.showOpenFilePicker({                                                                                               
               types: [{ description: label, accept }],                                                                                                    
               excludeAcceptAllOption: true,                                                                                                               
-              multiple: true,
+              multiple,
           });
           const files = await Promise.all(
               handles.map(handle => handle.getFile())

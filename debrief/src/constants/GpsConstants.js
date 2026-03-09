@@ -1,0 +1,22 @@
+export const ROW_SIZES = {
+  0x01: 32,
+  0x02: 44,  // Telemetry
+  0x03: 20,
+  0x04: 13,
+  0x05: 17,
+  0x06: 18,
+  0x07: 12,
+  0x08: 13,
+  0x0A: 16,
+  0x0B: 16,
+  0x0C: 12,
+  0x0E: 16,
+  0x0F: 16,
+  0x10: 12,
+  0x20: 13,
+  0x21: 52,
+  0xFF: 7,   // page header
+  0xFE: 2,   // page terminator
+};
+
+export const MS_TO_KNOTS = 1.94384;

@@ -8,6 +8,7 @@ import ListMedia from "./components/ListMedia"
 import AudioSource from "./components/AudioSource";
 import AudioPlayback from "./components/AudioPlayback";
 import {Routes, Route} from "react-router-dom";
+import DataSource from "./components/DataSource";
 
 
 function App() {
@@ -38,6 +39,7 @@ function App() {
       <div className="flex flex-row">
         <VideoSource />
         <AudioSource />
+        <DataSource />
       </div>} />
     </Routes>
     </div>

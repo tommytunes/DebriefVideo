@@ -16,7 +16,6 @@ const VideoPlayback = () => {
     const containerRef = useRef(null);
     const [splitRatio, setSplitRatio] = useState(0.5);
     const isDragging = useRef(false);
-    const SNAP_THRESHOLD = 0.15;
 
     const handlePointerDown = (e) => {
         isDragging.current = true;
@@ -35,6 +34,7 @@ const VideoPlayback = () => {
     const handlePointerUp = () => { isDragging.current = false; };
 
     const timelineStart = FindTimelineStart(state.videoGroups, state.audioGroups);
+    const absoluteTime = timelineStart + (state.currentTime * 1000);
     const timelineStartRef = useRef(timelineStart);
     const isSeekingRef = useRef(state.isSeeking.seeking);
 
@@ -130,7 +130,7 @@ const VideoPlayback = () => {
             preload='auto'
             muted={group1.muted}
             />
-            <VideoOverlay />
+            <VideoOverlay absoluteTime={absoluteTime}/>
         </div>
 
         :

@@ -47,7 +47,7 @@ function videoReducer(state, action) {
             return {...state, dataGroups:[...state.dataGroups, {
                 id: crypto.randomUUID(),
                 name: action.payload,
-                data: []
+                data: {}
             }
             ]};
         
@@ -56,6 +56,23 @@ function videoReducer(state, action) {
                 group.id !== action.payload
             );
             return {...state, dataGroups: deletedDataGroups };
+        
+        case 'ADD_DATA':
+            const { data, groupId: dataGroup } = action.payload;
+            const newDataGroups = state.dataGroups.map(group => 
+                group.id === dataGroup
+                ? {...group, data: data[0] }
+                : group
+            );
+            return {...state, dataGroups: newDataGroups};
+        
+        case 'REMOVE_DATA':
+            const updatedDataGroups = state.dataGroups.map(group =>
+                group.id === action.payload 
+                ? {...group, data: {}}
+                : group
+            );
+            return {...state, dataGroups: updatedDataGroups};
 
         case 'INVERT_MUTE_VIDEO':
             const newMutedGroups = state.videoGroups.map( group => 
