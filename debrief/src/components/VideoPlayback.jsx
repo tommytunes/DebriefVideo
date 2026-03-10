@@ -56,6 +56,7 @@ const VideoPlayback = () => {
     isGap1Ref.current = isGap1;
     isGap2Ref.current = isGap2;
     isPlayingRef.current = isPlaying;
+    isSeekingRef.current = state.isSeeking.seeking;
 
     clockSourcesRef.current = [
         {videoRef: videoRef1, isGap: isGap1, videoTimestamp: video1?.timestamp },
@@ -116,7 +117,7 @@ const VideoPlayback = () => {
         if (videoRef2.current && video2) videoRef2.current.currentTime = offsetInVideo2;
         dispatch({type: 'SET_SEEKING', payload: false});
 
-    }, [isPlaying, offsetInVideo1, offsetInVideo2, state.isSeeking.id]);
+    }, [state.isSeeking.id]);
 
 
     return (

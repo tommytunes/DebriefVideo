@@ -160,6 +160,7 @@ function videoReducer(state, action) {
             if (action.payload) {
                 return {...state, isSeeking: {seeking: action.payload, id: state.isSeeking.id + 1}};
             }
+            if (!state.isSeeking.seeking) return state;
             return {...state, isSeeking: {seeking: false, id: state.isSeeking.id}};
 
         case 'INCREMENT_TIME':

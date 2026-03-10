@@ -46,7 +46,7 @@ const AudioPlayback = () => {
                     }
             })
         
-    }, [isPlayingRef.current]);
+    }, [isPlaying]);
     // Effect 2: Audio 1 transition — hard seek when active clip changes
     useEffect(() => {
         state.audioGroups.forEach( group => {
@@ -67,11 +67,11 @@ const AudioPlayback = () => {
 
         state.audioGroups.forEach( group => {
                 const { audio, isGap, offsetInAudio } = FindActiveAudio(group, currentTimeRef.current, timelineStartRef.current);
-
                 if (audioRefs.current[group.id] && audio) audioRefs.current[group.id].currentTime = offsetInAudio;
-                dispatch({type: 'SET_SEEKING', payload: false});
-        })
-    }, [isPlayingRef.current, state.isSeeking.id]);
+                
+        });
+        dispatch({type: 'SET_SEEKING', payload: false});
+    }, [state.isSeeking.id]);
 
  return (
         <>

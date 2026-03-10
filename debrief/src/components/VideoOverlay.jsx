@@ -19,20 +19,21 @@ const VideoOverlay = ({absoluteTime}) => {
     return (
         <>
         { state.dataGroups.length > 0 &&
-        <div className="absolute top-2 left-2 bg-gray-500 text-white font-bold px-2 py-1 rounded">
+            <div className='absolute top-2 left-2 flex flex-col gap-2'>
             {state.dataGroups.map((group) => {
                 const data = findData(group.data.telemetry);
-                return (
-                    <>
-                    <p>{group.name}</p>
-                    <p>Speed: {data === null ? data.speed.toFixed(1): --} knots</p>
-                    <p>Heel: {data.heel.toFixed(1)}</p>
-                    <p>Heading: {data.heading.toFixed(1)}</p>
-                    <p>Pitch: {data.pitch.toFixed(1)}</p>
-                    </>
+                if (data === null) return;
+                return ( 
+                        <div key={group.id} className="bg-gray-500 text-white text-xl font-bold px-2 py-1 rounded">
+                        <p>{group.name}</p>
+                        <p>Speed: {data.speed !== null ? data.speed.toFixed(1): "--"} knots</p>
+                        <p>Heel: {data.heel !== null ? data.heel.toFixed(1): "--"}</p>
+                        <p>Heading: {data.heading !== null ? data.heading.toFixed(0): "--"}</p>
+                        <p>Pitch: {data.pitch !== null ? data.pitch.toFixed(1): "--"}</p>
+                        </div>
                 )
             })}    
-        </div>
+            </div>
         }
         </>
     );
