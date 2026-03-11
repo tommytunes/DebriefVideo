@@ -1,5 +1,6 @@
 appId: com.videodebrief.app
-productName: VideoDebrief
+productName: Sailing Debrief
+icon: build/DebriefIcon.png
 directories:
   output: release
 files:
@@ -8,4 +9,9 @@ files:
 mac:
   category: public.app-category.video
 win:
-  target: nsis
+  target:
+    - target: nsis
+      arch:
+        - x64
+nsis:
+  include: build/installer.nsh

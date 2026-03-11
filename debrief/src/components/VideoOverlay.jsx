@@ -1,6 +1,7 @@
-import { Underline } from 'lucide-react';
 import { useVideo } from '../contexts/VideoContext';
-import { useEffect } from 'react';
+import { useState } from 'react';
+import TelemetrySelection from './TelemetrySelection';
+
 
 const VideoOverlay = ({absoluteTime}) => {
     const { state } = useVideo();
@@ -23,13 +24,17 @@ const VideoOverlay = ({absoluteTime}) => {
             {state.dataGroups.map((group) => {
                 const data = findData(group.data.telemetry);
                 if (data === null) return;
+                const [telemetry, setTelemetry] = useState({speed: true, heel: true, heading: true, pitch: true})
                 return ( 
                         <div key={group.id} className="bg-gray-500 text-white text-xl font-bold px-2 py-1 rounded">
-                        <p>{group.name}</p>
-                        <p>Speed: {data.speed !== null ? data.speed.toFixed(1): "--"} knots</p>
-                        <p>Heel: {data.heel !== null ? data.heel.toFixed(1): "--"}</p>
-                        <p>Heading: {data.heading !== null ? data.heading.toFixed(0): "--"}</p>
-                        <p>Pitch: {data.pitch !== null ? data.pitch.toFixed(1): "--"}</p>
+                            <div className='flex flex-row justify-between'>
+                                <p>{group.name}</p>
+                                <TelemetrySelection state={telemetry} setState={setTelemetry}/>
+                            </div>
+                        {telemetry.speed && <p>Speed: {data.speed !== null ? data.speed.toFixed(1): "--"} </p>}
+                        {telemetry.heel && <p>Heel: {data.heel !== null ? data.heel.toFixed(1): "--"}</p>}
+                        {telemetry.heading && <p>Heading: {data.heading !== null ? data.heading.toFixed(0): "--"}</p>}
+                        {telemetry.pitch && <p>Pitch: {data.pitch !== null ? data.pitch.toFixed(1): "--"}</p>}
                         </div>
                 )
             })}    
