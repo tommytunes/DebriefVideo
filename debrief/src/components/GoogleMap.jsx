@@ -4,14 +4,15 @@ import {
     Map,
     Marker,
     AdvancedMarker,
-    useMap
+    useMap,
+    AdvancedMarkerAnchorPoint
 } from '@vis.gl/react-google-maps';
-import { findTelemetryData, findTelemetryRange } from '../utils/FindTelemetryData';
+import { findTelemetryData, findTelemetryRange, calculateBearing } from '../utils/FindTelemetryData';
 import { useVideo } from '../contexts/VideoContext';
 
 
 const SailboatMarker = ({position, heading, mapHeading, name }) => (
-    <AdvancedMarker position={position}>
+    <AdvancedMarker position={position} anchorPoint={AdvancedMarkerAnchorPoint.CENTER}>
         <div style={{ transform: `rotate(${heading - mapHeading}deg)`, transformOrigin: 'center' }}>
             <p>{name}</p>
             <svg width="28" height="28" viewBox='0 0 28 28' fill='white'>
@@ -69,26 +70,72 @@ const RecenterButton = ({ center, heading }) => {
 const GoogleMap = ({absoluteTime}) => {
     const { state } = useVideo();
     const firstGroup = state.dataGroups[0];
+    if (!firstGroup) return null;
+
+    const [isOnline, setIsOnline] = useState(navigator.onLine);
+    useEffect(() => {
+        const goOnline = () => setIsOnline(true);
+        const goOffline = () => setIsOnline(false);
+        window.addEventListener('online', goOnline);
+        window.addEventListener('offline', goOffline);
+        return () => {
+            window.removeEventListener('online', goOnline);
+            window.removeEventListener('offline', goOffline);
+        };
+    }, []);
+
+
     const data = findTelemetryData(firstGroup.data.telemetry, absoluteTime);
     const [mapHeading, setMapHeading] = useState(0);
 
     const centerData = data ? {lat: data.latitude, lng: data.longitude} : {lat: 0, lgn: 0};
     const heading = data ? data.heading : 0;
+    const firstTrailPoints = findTelemetryRange(firstGroup.data.telemetry, absoluteTime, 300000);                                                                                                                                                                                                                                    
+    const firstTrailHeading = firstTrailPoints.length >= 2                                                                                                                                                                                                                                                                           
+    ? calculateBearing(                                                                                                                                                                                                                                                                                                          
+        firstTrailPoints[firstTrailPoints.length - 2].latitude,
+        firstTrailPoints[firstTrailPoints.length - 2].longitude,
+        firstTrailPoints[firstTrailPoints.length - 1].latitude,
+        firstTrailPoints[firstTrailPoints.length - 1].longitude
+    )
+    : heading;
+    
+    if (!isOnline) {
+     return (
+         <div style={{ height: '100%', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#1a1a2e', color: 'white' }}>
+             <div style={{ textAlign: 'center' }}>
+                 <p style={{ fontSize: 18, fontWeight: 'bold' }}>No Internet Connection</p>
+                 <p style={{ fontSize: 14, color: '#aaa', marginTop: 8 }}>
+                     An internet connection is required to display the map.
+                 </p>
+             </div>
+         </div>
+     );
+    }
+
 
     return (
         <APIProvider apiKey={import.meta.env.VITE_PUBLIC_GOOGLE_MAPS_API_KEY}>
         <div style={{ height: "100%", width:"100%", position: 'relative'}}>
-            <RecenterButton center={centerData} heading={heading} />
+            <RecenterButton center={centerData} heading={firstTrailHeading} />
             {state.dataGroups.map( group => {
                 if (group === null) return;
                 const data = findTelemetryData(group.data.telemetry, absoluteTime);
                 const trailPoints = findTelemetryRange(group.data.telemetry, absoluteTime, 300000);
                 const path = trailPoints.map(d => ({lat: d.latitude, lng: d.longitude}));
                 if(!data) return;
+                const trailHeading = trailPoints.length >= 2
+                    ? calculateBearing(
+                        trailPoints[trailPoints.length - 2].latitude,
+                        trailPoints[trailPoints.length - 2].longitude,
+                        trailPoints[trailPoints.length - 1].latitude,
+                        trailPoints[trailPoints.length - 1].longitude
+                      )
+                    : data.heading;
                 return (
                 <>
                     <BoatTrail key={`trail-${group.id}`} path={path} color={'red'} />
-                    <SailboatMarker key={group.id} position={{lat: data.latitude, lng: data.longitude}} heading={data.heading} mapHeading={mapHeading} name={group.name}/>
+                    <SailboatMarker key={group.id} position={{lat: data.latitude, lng: data.longitude}} heading={trailHeading} mapHeading={mapHeading} name={group.name}/>
                 </>);
             })}
             <Map
