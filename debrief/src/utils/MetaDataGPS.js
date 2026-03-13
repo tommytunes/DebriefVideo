@@ -66,8 +66,8 @@ async function parseGPSData(file) {
 
         if (key === 0x02) {
             const timestamp = readU64();
-            skip(4) // latitude
-            skip(4) // longitude
+            const latitude = readI4(); // latitude
+            const longitude = readI4(); // longitude
             const speed = readF4() * MS_TO_KNOTS
             skip(4) // COG
             skip(4) // altitude
@@ -78,7 +78,9 @@ async function parseGPSData(file) {
                 speed: speed,
                 heel: heel,
                 pitch: pitch,
-                heading: heading
+                heading: heading,
+                latitude: latitude / 10**7,
+                longitude: longitude / 10**7
             })
         } else {
             offset += size;

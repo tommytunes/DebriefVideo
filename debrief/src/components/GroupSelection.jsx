@@ -19,6 +19,7 @@ const GroupSelection = ({groups, type, label}) => {
                     groups.map( group => (
                         <option key={group.id} value={group.id}>{group.name}</option>
                     ))}
+                    <option key={"map"} value="map">Boat Track</option>
                 </select>
             </label>
             </div>
@@ -33,6 +34,7 @@ const GroupSelection = ({groups, type, label}) => {
                         groups.map( group => (
                             <option key={group.id} value={group.id}>{group.name}</option>
                         ))}
+                        <option key={"map"} value="map">Boat Track</option>
                     </select>
                 </label>
             </div>

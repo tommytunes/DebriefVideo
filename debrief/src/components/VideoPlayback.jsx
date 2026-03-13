@@ -5,6 +5,7 @@ import { usePlayback } from '../hooks/usePlayback';
 import { useRef, useEffect, useState } from 'react';
 import { useMasterClock } from '../hooks/useMasterClock';
 import VideoOverlay from './VideoOverlay';
+import GoogleMap from './GoogleMap';
 import { Video } from 'lucide-react';
 
 const VideoPlayback = () => {
@@ -122,7 +123,12 @@ const VideoPlayback = () => {
 
     return (
         <div className='flex h-[100%]' ref={containerRef} onPointerMove={handlePointerMove} onPointerUp={handlePointerUp}>
-        {(!isGap1 && video1) && (splitRatio > 0) ?
+        
+        {state.groupIdVideo1 === 'map' ? 
+        <div key="map1" className="relative h-full w-full bg-black overflow-hidden" style={{width: `${splitRatio * 100}%`}}>
+            <GoogleMap absoluteTime={absoluteTime}/>
+        </div> :
+        (!isGap1 && video1) && (splitRatio > 0) ?
         <div key="video1" className="relative h-full w-full bg-black overflow-hidden" style={{width: `${splitRatio * 100}%`}}>
             <video
             ref={videoRef1}
@@ -141,14 +147,18 @@ const VideoPlayback = () => {
             className="w-full h-full object-contain"
             />
         </div>
-        }
-
+        
+    }
         
         <div className="w-2 bg-gray-600 hover:bg-blue-500 cursor-col-resize flex-shrink-0"
                onPointerDown={handlePointerDown} />
         
 
-        {(!isGap2 && video2) && (splitRatio < 1) ?
+        { state.groupIdVideo2 === 'map' ? 
+        <div key="map2" className="h-full w-full bg-black overflow-hidden" style={{width: `${(1 - splitRatio) * 100}%`}}>
+            <GoogleMap absoluteTime={absoluteTime}/>
+        </div> :
+        (!isGap2 && video2) && (splitRatio < 1) ?
         <div key="video2" className="h-full w-full bg-black overflow-hidden" style={{width: `${(1 - splitRatio) * 100}%`}}>
             <video
             ref={videoRef2}

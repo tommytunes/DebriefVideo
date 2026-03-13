@@ -1,28 +1,18 @@
 import { useVideo } from '../contexts/VideoContext';
 import { useState } from 'react';
 import TelemetrySelection from './TelemetrySelection';
+import { findTelemetryData } from '../utils/FindTelemetryData';
 
 
 const VideoOverlay = ({absoluteTime}) => {
     const { state } = useVideo();
-
-    const findData = (telemetry) =>  {
-        if (!telemetry || telemetry.length === 0) return null;
-        const target = BigInt(Math.floor(absoluteTime));
-        let closest = telemetry[0];
-        for (const data of telemetry) {
-            if (data.timestamp <= target) closest = data;
-            else break;
-        }
-        return closest;
-    }
    
     return (
         <>
         { state.dataGroups.length > 0 &&
             <div className='absolute top-2 left-2 flex flex-col gap-2'>
             {state.dataGroups.map((group) => {
-                const data = findData(group.data.telemetry);
+                const data = findTelemetryData(group.data.telemetry, absoluteTime);
                 if (data === null) return;
                 const [telemetry, setTelemetry] = useState({speed: true, heel: true, heading: true, pitch: true})
                 return ( 
