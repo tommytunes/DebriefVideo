@@ -41,10 +41,27 @@ const VideoSource = () => {
     };
 
     const onFilesVideo = async (files, handles, groupId) => {
+        console.log('[VideoSource] onFilesVideo', { count: files?.length ?? 0, groupId });
+        if (!files || files.length === 0) {
+            console.warn('[VideoSource] No files selected for video group', groupId);
+            return;
+        }
         const videos = await Promise.all(files.map(async file => {
-              const { creation, duration } = await extractMetaDataVideo(file);
-              return { id: crypto.randomUUID(), file, url: URL.createObjectURL(file), timestamp: creation, duration };
+              try {
+                  const { creation, duration } = await extractMetaDataVideo(file);
+                  return { id: crypto.randomUUID(), file, url: 'file://' + file._filePath, timestamp: creation, duration };
+              } catch (error) {
+                  console.error('[VideoSource] Failed to extract video metadata:', error);
+                  return {
+                      id: crypto.randomUUID(),
+                      file,
+                      url: 'file://' + file._filePath,
+                      timestamp: new Date(file.lastModified),
+                      duration: 0
+                  };
+              }
           }));
+          console.log(files, groupId);
           dispatch({ type: 'ADD_VIDEO', payload: { videos, groupId } });
       };
 

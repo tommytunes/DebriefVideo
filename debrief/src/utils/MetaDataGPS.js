@@ -18,8 +18,14 @@ function quarternionToEuleur(w, x, y, z) {
 }
 
 async function parseGPSData(file) {
-    const arrayBuffer = await file.arrayBuffer();
-    const view = new DataView(arrayBuffer);
+if (!file._filePath) {
+         console.error('[MetaDataGPS] file._filePath is undefined', file);
+         return [];
+     }
+     const buf = await window.electronAPI.readFileBuffer(file._filePath);
+     // buf arrives as Uint8Array via IPC — extract the underlying ArrayBuffer
+     const arrayBuffer = buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength);
+     const view = new DataView(arrayBuffer);
     let offset = 0;
     const data = [];
 

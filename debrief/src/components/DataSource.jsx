@@ -27,12 +27,17 @@ const DataSource = () => {
     };
 
     const onFilesData = async (files, handles, groupId) => {
-            const data = await Promise.all(files.map(async file => {
-                const telemetry = await extractMetaDataGPS(file);
-                return { id: crypto.randomUUID(), file, url: URL.createObjectURL(file), telemetry: telemetry };
-              }));
-              dispatch({ type: 'ADD_DATA', payload: { data, groupId } });
-          };
+        const data = await Promise.all(files.map(async file => {
+            let telemetry = [];
+            try {
+                telemetry = await extractMetaDataGPS(file);
+            } catch (err) {
+                console.error('[DataSource] GPS parse error for', file.name, err);
+            }
+            return { id: crypto.randomUUID(), file, url: 'file://' + file._filePath, telemetry };
+        }));
+        dispatch({ type: 'ADD_DATA', payload: { data, groupId } });
+    };
 
     return (
         <div className="flex flex-col">

@@ -55,7 +55,7 @@ const AudioSource = () => {
     const onFilesAudio = async (files, handles, groupId) => {
         const audios = await Promise.all(files.map(async file => {
               const { creation, duration } = await extractMetaDataAudio(file);
-              return { id: crypto.randomUUID(), file, url: URL.createObjectURL(file), timestamp: creation, duration };
+              return { id: crypto.randomUUID(), file, url: 'file://' + file._filePath, timestamp: creation, duration };
           }));
           dispatch({ type: 'ADD_AUDIO', payload: { audios, groupId } });
       };

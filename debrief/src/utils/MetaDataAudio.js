@@ -1,8 +1,9 @@
-import { parseBlob } from 'music-metadata';
+import { parseBuffer } from 'music-metadata';
 
 export async function extractMetaDataAudio(file) {
     try {
-        const metadata = await parseBlob(file);
+        const arrayBuffer = await file.arrayBuffer();
+        const metadata = await parseBuffer(new Uint8Array(arrayBuffer), { path: file.name });
         const creationTime = metadata.format.creationTime === undefined ? new Date(file.lastModified) : metadata.format.creationTime;
         return {creation : creationTime, duration : metadata.format.duration};
     }

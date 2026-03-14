@@ -19,13 +19,14 @@ if (!gotTheLock) {
     const icon = nativeImage.createFromPath(path.join(__dirname, '../build/DebriefIcon.png'));
     const win = new BrowserWindow({
       icon,
-      width: 1400,
-      height: 900,
+      width: 1600,
+      height: 1000,
       title: 'Sailing Debrief',
       webPreferences: {
         preload: path.join(__dirname, 'preload.cjs'),
         contextIsolation: true,
         nodeIntegration: false,
+        webSecurity: false
       },
     })
 
@@ -37,30 +38,60 @@ if (!gotTheLock) {
     }
   }
 
-  ipcMain.handle('dialog:openFiles', async (_event, options) => {
+  ipcMain.handle('dialog:openFiles', async (_event, accept, multiple) => {
+    const extensions = Object.values(accept || {}).flat().map(e => e.replace(/^\./, ''));
+    const filters = extensions.length ? [{ name: 'Files', extensions }] : [];
+    const properties = multiple ? ['openFile'] : ['openFile', 'multiSelections'];
     const { canceled, filePaths } = await dialog.showOpenDialog({
-      properties: ['openFile', 'multiSelections'],
-      filters: options.filters ?? [],
+      properties: properties,
+      filters,
     })
     if (canceled) return []
 
     return filePaths.map(filePath => ({
       name: path.basename(filePath),
       lastModified: fs.statSync(filePath).mtimeMs,
-      buffer: fs.readFileSync(filePath),
+      path: filePath,
     }))
   })
+
+  ipcMain.handle('fs:readFileHead', async (_event, filePath, bytes) => {
+    const stat = fs.statSync(filePath);
+    const size = Math.min(bytes, stat.size);
+    const buf = Buffer.alloc(size);
+    const fd = fs.openSync(filePath, 'r');
+    fs.readSync(fd, buf, 0, size, 0);
+    fs.closeSync(fd);
+    return { buffer: buf, size: stat.size, start: 0 };
+  })
+
+  ipcMain.handle('fs:readFileSlice', async (_event, filePath, start, length) => {
+    const stat = await fs.promises.stat(filePath);
+    const safeStart = Math.max(0, Math.min(start, stat.size));
+    const safeLength = Math.max(0, Math.min(length, stat.size - safeStart));
+    const buf = Buffer.alloc(safeLength);
+    const fd = await fs.promises.open(filePath, 'r');
+    await fd.read(buf, 0, safeLength, safeStart);
+    await fd.close();
+    return { buffer: buf, size: stat.size, start: safeStart };
+  })
+
+  ipcMain.handle('fs:readFileBuffer', async (_event, filePath) => {
+     return fs.promises.readFile(filePath);
+  })
+
+
 
   app.on('before-quit', () => {
     app.isQuitting = true
   })
 
   app.whenReady().then(() => {
-    createWindow()
+    createWindow();
     app.on('activate', () => {
-      if (BrowserWindow.getAllWindows().length === 0) createWindow()
-    })
-  })
+      if (BrowserWindow.getAllWindows().length === 0) createWindow();
+    });
+  });
 
   app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') app.quit()
