@@ -61,7 +61,7 @@ function videoReducer(state, action) {
             const { data, groupId: dataGroup } = action.payload;
             const newDataGroups = state.dataGroups.map(group => 
                 group.id === dataGroup
-                ? {...group, data: data[0] }
+                ? {...group, data: data[0] ?? {} }
                 : group
             );
             return {...state, dataGroups: newDataGroups};
@@ -172,20 +172,25 @@ function videoReducer(state, action) {
         case 'SET_VIDEO2':
             return {...state, groupIdVideo2: action.payload};
 
-        case 'TIMESTAMPS_AUDIO':
+        case 'TIMESTAMPS_AUDIO': // fix that it just delays by offset and not stick them together 
             const { groupId, timeStamp, offsetTimestamp } = action.payload;
             
             const accurateTimeStamp = timeStamp.getTime() - offsetTimestamp * 1000;
             
-            const delayedTimeStampsGroups = state.audioGroups.map( group =>
-                group.id === groupId
-                ? {...group, audios: group.audios.map( (audio, index) => {
-                    const precedingMs = group.audios.slice(0, index).reduce((sum, a) => sum + a.duration, 0) * 1000;
-                    return {...audio, timestamp: new Date(accurateTimeStamp + precedingMs)};
-                }                
-                )} : group
+            const delayedTimeStampsGroups = state.audioGroups.map( group => {
+                if (group.id !== groupId) return group;
+
+                const firstOriginal = group.audios[0].originalTimeStamp.getTime();
+                return {...group, audios: group.audios.map( audio => {
+                    const offset = audio.originalTimeStamp.getTime() - firstOriginal;
+                    return {...audio, timestamp: new Date( accurateTimeStamp + offset) }
+                })};
+            }
             );
             return {...state, audioGroups: delayedTimeStampsGroups};
+
+        case 'LOAD_PROJECT':
+            return {...initialState, ...action.payload};
         
         default:
             return state;

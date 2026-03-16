@@ -9,6 +9,7 @@ import AudioSource from "./components/AudioSource";
 import AudioPlayback from "./components/AudioPlayback";
 import {Routes, Route} from "react-router-dom";
 import DataSource from "./components/DataSource";
+import ProjectSaveLoad from "./components/ProjectSaveLoad";
 
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
   return (
     <div className="flex flex-col h-screen">
     <NavBar />
+    <ProjectSaveLoad />
     <Routes>
       <Route path="/" element={
       <>

@@ -5,4 +5,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   readFileHead: (filePath, bytes) => ipcRenderer.invoke('fs:readFileHead', filePath, bytes),
   readFileSlice: (filePath, start, length) => ipcRenderer.invoke('fs:readFileSlice', filePath, start, length),
   readFileBuffer: (filePath) => ipcRenderer.invoke('fs:readFileBuffer', filePath),
+  saveProject: (jsonString, filePath) => ipcRenderer.invoke('project:save', jsonString),
+  loadProject: () => ipcRenderer.invoke('project:load'),
+  onMenuSave: (cb) => ipcRenderer.on('menu:saveProject', cb),
+  onMenuLoad: (cb) => ipcRenderer.on('menu:loadProject', cb)
 })

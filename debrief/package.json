@@ -17,7 +17,7 @@
     "electron:dev": "concurrently \"vite\" \"wait-on http://localhost:5173 && electron .\"",
     "electron:build": "vite build && electron-builder",
     "electron:build:win": "vite build && electron-builder --win",
-    "electron:build:mac": "electron-builder --mac",
+    "electron:build:mac": "vite build && electron-builder --mac",
     "electron:build:all": "vite build && electron-builder --mac --win"
   },
   "dependencies": {

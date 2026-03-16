@@ -146,7 +146,8 @@ const GoogleMap = ({absoluteTime}) => {
             mapId={import.meta.env.VITE_PUBLIC_GOOGLE_MAPS_ID}
             mapTypeControlOptions={false}
             mapTypeControl={false}
-             />
+            disableDefaultUI={true}
+            />
         </div>
         </APIProvider>
     );

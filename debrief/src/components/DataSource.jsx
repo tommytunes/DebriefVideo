@@ -63,7 +63,7 @@ const DataSource = () => {
                                 <button onClick={() => handleDeleteGroup(group.id)} className="btn btn-sm">Delete Group</button>
                             </div>
                             <ul key={group.id} className="list">
-                                {group.data.file &&
+                                {group.data?.file &&
                                     <div key={group.data.id} className="list-row">
                                         <div>
                                             <li key={group.data.id} className="list-col-grow">{group.data.file.name}</li>
@@ -72,7 +72,7 @@ const DataSource = () => {
                                     </div>
                                 }
                             </ul>
-                            {!group.data.file &&
+                            {!group.data?.file &&
                                 <MediaDropZone 
                                 groupId={group.id}
                                 accept={{ "application/octet-stream": [".vkx"] }}
