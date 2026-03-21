@@ -38,6 +38,7 @@ const VideoPlayback = () => {
     const absoluteTime = timelineStart + (state.currentTime * 1000);
     const timelineStartRef = useRef(timelineStart);
     const isSeekingRef = useRef(state.isSeeking.seeking);
+    const isDraggingTimelineRef = useRef(state.isDragging);
 
     const group1 = state.videoGroups.find(group => group.id === state.groupIdVideo1);
     const group2 = state.videoGroups.find(group => group.id === state.groupIdVideo2);
@@ -58,13 +59,15 @@ const VideoPlayback = () => {
     isGap2Ref.current = isGap2;
     isPlayingRef.current = isPlaying;
     isSeekingRef.current = state.isSeeking.seeking;
+    timelineStartRef.current = timelineStart;
+    isDraggingTimelineRef.current = state.isDragging;
 
     clockSourcesRef.current = [
         {videoRef: videoRef1, isGap: isGap1, videoTimestamp: video1?.timestamp },
         {videoRef: videoRef2, isGap: isGap2, videoTimestamp: video2?.timestamp }
     ].sort( (a, b) => a.videoTimestamp - b.videoTimestamp);
 
-    useMasterClock(state.isPlaying, dispatch, timelineStartRef, clockSourcesRef, isSeekingRef);
+    useMasterClock(state.isPlaying, dispatch, timelineStartRef, clockSourcesRef, isSeekingRef, isDraggingTimelineRef);
 
     // Effect 1: Play/Pause — seek to correct position then play, or pause
     useEffect(() => {
@@ -122,7 +125,7 @@ const VideoPlayback = () => {
 
 
     return (
-        <div className='flex h-[100%]' ref={containerRef} onPointerMove={handlePointerMove} onPointerUp={handlePointerUp}>
+        <div className='flex h-[100%] overflow-hidden' ref={containerRef} onPointerMove={handlePointerMove} onPointerUp={handlePointerUp}>
         
         {state.groupIdVideo1 === 'map' ? 
         <div key="map1" className="relative h-full w-full bg-black overflow-hidden" style={{width: `${splitRatio * 100}%`}}>

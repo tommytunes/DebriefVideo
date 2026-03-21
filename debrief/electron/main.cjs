@@ -4,6 +4,12 @@ const fs = require('fs')
 
 let win;
 
+function forceZoomReset() {
+  if (!win || win.isDestroyed()) return;
+  win.webContents.setZoomLevel(0);
+  win.webContents.setZoomFactor(1);
+}
+
 function createWindow() {
   const { nativeImage } = require('electron');
   const icon = nativeImage.createFromPath(path.join(__dirname, '../build/DebriefIcon.png'));
@@ -20,6 +26,22 @@ function createWindow() {
     },
   })
 
+  win.webContents.setVisualZoomLevelLimits(1, 1);
+
+  win.webContents.on('did-finish-load', () => {
+    forceZoomReset();
+  });
+
+  // HashRouter route changes
+  win.webContents.on('did-navigate-in-page', () => {
+    forceZoomReset();
+  });
+
+  // Extra safety on any full navigation
+  win.webContents.on('did-navigate', () => {
+    forceZoomReset();
+  });
+
   win.webContents.openDevTools()
   win.loadFile(path.join(__dirname, '../dist/index.html'))
   createAppMenu()
@@ -28,7 +50,7 @@ function createWindow() {
 function createAppMenu() {
   const template = [
     {
-      label: app.name
+      label: app.name,
     },
     {
       label: 'File',
@@ -85,14 +107,14 @@ ipcMain.handle('fs:readFileBuffer', async (_event, filePath) => {
 })
 
 ipcMain.handle('project:save', async (_event, jsonString) => {
-  const { canceled, filePath } = await dialog.showSaveDialog({ defaultPath: 'project.debrief', filters: [{ name: 'Debrief Project', extensions: ['debrief'] }] });
+  const { canceled, filePath } = await dialog.showSaveDialog(win, { defaultPath: 'project.debrief', filters: [{ name: 'Debrief Project', extensions: ['debrief'] }] });
   if (canceled) return {success: false};
   fs.writeFileSync(filePath, jsonString, 'utf8');
   return {success: true, filePath: filePath};
 });
 
 ipcMain.handle('project:load', async (_event) => {
-  const { canceled, filePaths } = await dialog.showOpenDialog({ properties: ['openFile'], filters: [{ name: 'Debrief Project', extensions: ['debrief'] }] });
+  const { canceled, filePaths } = await dialog.showOpenDialog(win, { properties: ['openFile'], filters: [{ name: 'Debrief Project', extensions: ['debrief'] }] });
   if (canceled) return { success: false };
   const json = fs.readFileSync(filePaths[0], 'utf8');
   return { success: true, json, filePath: filePaths[0]}; // unsure for the indexing here

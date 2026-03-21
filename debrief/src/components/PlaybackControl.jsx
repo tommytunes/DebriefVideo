@@ -2,9 +2,11 @@ import { usePlayback } from "../hooks/usePlayback";
 import { useEffect, useRef } from "react";
 import Play from '../assets/play.png';
 import Pause from '../assets/pause.png';
+import { useVideo } from "../contexts/VideoContext";
 
 const PlaybackControl = () => {
     const { isPlaying, currentTime, currentTimestamp, play, pause, seek } = usePlayback();
+    const { state } = useVideo();
 
     const currentTimeRef = useRef(currentTime);
     const isPlayingRef = useRef(isPlaying);
@@ -70,11 +72,11 @@ const PlaybackControl = () => {
     
      
     return (
-        <div className="flex flex-row"> 
+        <div className="flex flex-row gap-4"> 
             {!isPlaying ?
                 <button onClick={play} className="px-4 py-2"><img src={Play} /></button> :
                 <button onClick={pause} className="px-4 py-2"><img src={Pause} /></button>
-            } 
+            }            
         </div>
     )
 }

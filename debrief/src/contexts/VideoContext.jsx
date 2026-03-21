@@ -7,6 +7,7 @@ const initialState = {
     currentTime: 0,
     isPlaying: false,
     isSeeking: {seeking: false, id: 0},
+    isDragging: false,
     groupIdVideo1: null,
     groupIdVideo2: null
 };
@@ -191,6 +192,9 @@ function videoReducer(state, action) {
 
         case 'LOAD_PROJECT':
             return {...initialState, ...action.payload};
+
+        case 'SET_DRAGGING':
+            return {...state, isDragging: action.payload};
         
         default:
             return state;

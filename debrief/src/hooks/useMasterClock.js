@@ -1,7 +1,7 @@
 import { useRef, useEffect } from 'react';
 import { useVideo } from '../contexts/VideoContext';
 
-export function useMasterClock(isPlaying, dispatch, timelineStartRef, clockSources, isSeekingRef) {
+export function useMasterClock(isPlaying, dispatch, timelineStartRef, clockSources, isSeekingRef, isDraggingRef) {
 
     const rafId = useRef(null);
     const lastRafId = useRef(null);    

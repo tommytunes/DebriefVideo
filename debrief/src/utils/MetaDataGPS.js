@@ -13,7 +13,7 @@ function quarternionToEuleur(w, x, y, z) {
     return {
         heel: roll * toDeg,
         pitch: pitch * toDeg,
-        heading: (-yaw * toDeg % 360 + 360) % 360
+        heading: (yaw * toDeg % 360 + 360) % 360
     }
 }
 

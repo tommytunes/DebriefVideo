@@ -10,7 +10,7 @@ import { usePlayback } from '../hooks/usePlayback';
 
 export const TimelineEditor = () => {
 
-    const { state } = useVideo();
+    const { state, dispatch } = useVideo();
     const { seek } = usePlayback();
     const containerRef  = useRef(null);
     const timelineRef = useRef(null);
@@ -52,8 +52,12 @@ export const TimelineEditor = () => {
         if (!containerRef.current) return;
         const container = containerRef.current;
 
+        let rafId;
         const update = () => {
-            setContainerWidth(container.clientWidth);
+            cancelAnimationFrame(rafId);
+            rafId = requestAnimationFrame(() => {
+                setContainerWidth(container.clientWidth);
+            });
         }
         update();
 
@@ -75,7 +79,7 @@ export const TimelineEditor = () => {
 
         timelineRef.current.setTime(state.currentTime);
 
-    }, [state.currentTime]);
+    }, [state.currentTime, timelineData]);
 
     const ClickCursor = (time, event) => {
         event.preventDefault();
@@ -86,6 +90,15 @@ export const TimelineEditor = () => {
     const CursorDrag = (time) => {
         seek(time);
         timelineRef.current.setTime(time);
+    }
+
+    const CursorDragStart = () => {
+        dispatch({type: 'SET_DRAGGING', payload: true});
+    }
+
+    const CursorDragEnd = (time) => {
+        dispatch({type: 'SET_DRAGGING', payload: false});
+        seek(time);
     }
     
     return (
@@ -103,6 +116,8 @@ export const TimelineEditor = () => {
             scaleWidth={scaleWidth}
             onClickTimeArea={ClickCursor}
             onCursorDrag={CursorDrag}
+            onCursorDragStart={CursorDragStart}
+            onCursorDragEnd={CursorDragEnd}
             />
         </div>
 

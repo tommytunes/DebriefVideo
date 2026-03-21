@@ -62,7 +62,7 @@ const AudioSource = () => {
 
     return (
         <div className="flex flex-col">
-        <div className="card card-border w-100 m-10">
+        <div className="card card-border w-full max-w-100 mx-auto my-4">
             <div className="card-body">
                 <h1 className="card-title text-2xl font-bold">Audio Source</h1>
                 <form onSubmit={handleSubmit}>
@@ -77,7 +77,7 @@ const AudioSource = () => {
                 {state.audioGroups.length === 0 ?
                 <></> :
                 state.audioGroups.map( group => (
-                    <div key={group.id} className="card card-border w-100 m-10">
+                    <div key={group.id} className="card card-border w-full max-w-100 mx-auto my-4">
                         <div className="card-body">
                             <h1 className="font-bold">{group.name}</h1>
                             <div>

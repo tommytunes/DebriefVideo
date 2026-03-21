@@ -14,7 +14,8 @@ const ProjectSaveLoad = () => {
 
     async function handleSave() {
         const json = JSON.stringify(projectSerializer(stateRef.current), null,2);
-        const result = await window.electronAPI.saveProject(json)  
+        const result = await window.electronAPI.saveProject(json)
+        console.log(stateRef);  
     }
     
     async function handleLoad() {
@@ -22,6 +23,7 @@ const ProjectSaveLoad = () => {
         if (!result.success) return;
         const payload = await projectDeSerializer(result.json);
         dispatch({type: 'LOAD_PROJECT', payload: payload});
+        console.log(stateRef);
     }
     return null;
 };

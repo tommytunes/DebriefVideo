@@ -88,7 +88,7 @@ const GoogleMap = ({absoluteTime}) => {
     const data = findTelemetryData(firstGroup.data.telemetry, absoluteTime);
     const [mapHeading, setMapHeading] = useState(0);
 
-    const centerData = data ? {lat: data.latitude, lng: data.longitude} : {lat: 0, lgn: 0};
+    const centerData = data ? {lat: data.latitude, lng: data.longitude} : {lat: 0, lng: 0};
     const heading = data ? data.heading : 0;
     const firstTrailPoints = findTelemetryRange(firstGroup.data.telemetry, absoluteTime, 300000);                                                                                                                                                                                                                                    
     const firstTrailHeading = firstTrailPoints.length >= 2                                                                                                                                                                                                                                                                           
