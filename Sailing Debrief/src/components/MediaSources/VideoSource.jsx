@@ -1,0 +1,126 @@
+import MediaDropZone from "../Files/MediaDropZone";
+import { useVideo } from '../../contexts/VideoContext';
+import { useMemo, useState } from 'react';
+import { extractMetaDataVideo } from '../../utils/MetaData';
+
+
+const VideoSource = () => {
+
+    const { state, dispatch } = useVideo();
+
+    const [inputValue, setInputValue] = useState('');
+    const [customTimeStamp, setCustomTimeStamp] = useState({});
+
+    const toggleTimestampInput = (videoId) => {
+        setCustomTimeStamp(prev => ({
+            ...prev,
+            [videoId]: !prev[videoId]
+        }));
+    };
+
+    const handleChange = (e) => {
+        setInputValue(e.target.value);
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        dispatch({type: 'ADD_VIDEO_GROUP', payload: inputValue});
+        setInputValue('');
+    };
+
+    const handleDeleteGroup = (groupId) => {
+        dispatch({type: 'DELETE_VIDEO_GROUP', payload: groupId})
+    };
+
+    const handleDeleteVideo = (groupId, videoId) => {
+        dispatch({type: 'REMOVE_VIDEO', payload: {groupId: groupId, videoId: videoId}});
+    };
+
+    const handleTimeStamp = (groupId, videoId, newTimestamp) => {
+        dispatch({type: 'SET_TIMESTAMP_VIDEO', payload: {videoGroupId: groupId, videoId: videoId, newVideoTimeStamp: new Date(newTimestamp)}});
+    };
+
+    const onFilesVideo = async (files, handles, groupId) => {
+        console.log('[VideoSource] onFilesVideo', { count: files?.length ?? 0, groupId });
+        if (!files || files.length === 0) {
+            console.warn('[VideoSource] No files selected for video group', groupId);
+            return;
+        }
+        const videos = await Promise.all(files.map(async file => {
+              try {
+                  const { creation, duration } = await extractMetaDataVideo(file);
+                  return { id: crypto.randomUUID(), file, url: 'file://' + file._filePath, timestamp: creation, duration };
+              } catch (error) {
+                  console.error('[VideoSource] Failed to extract video metadata:', error);
+                  return {
+                      id: crypto.randomUUID(),
+                      file,
+                      url: 'file://' + file._filePath,
+                      timestamp: new Date(file.lastModified),
+                      duration: 0
+                  };
+              }
+          }));
+          console.log(files, groupId);
+          dispatch({ type: 'ADD_VIDEO', payload: { videos, groupId } });
+      };
+
+
+    return (
+        <div className="flex flex-col">
+        <div className="card card-border w-full max-w-100 mx-auto my-4">
+            <div className="card-body">
+                <h1 className="card-title text-2xl font-bold">Video Source</h1>
+                <form onSubmit={handleSubmit}>
+                    <label>
+                    Input Name of Video Group :
+                    <input type="text" className="input" onChange={handleChange} value={inputValue} required/>
+                    </label>
+                    <button type='submit' className="btn m-2">Add Video Group</button>
+                </form>
+            </div>
+        </div>
+                {state.videoGroups.length === 0 ?
+                <></> :
+                state.videoGroups.map( group => (
+                    <div key={group.id} className="card card-border w-full max-w-100 mx-auto my-4">
+                        <div className="card-body">
+                            <h1 className="font-bold">{group.name}</h1>
+                            <div>
+                                <button onClick={() => handleDeleteGroup(group.id)} className="btn btn-sm">Delete Group</button>
+                            </div>
+                            <ul key={group.id} className="list">
+                                {group.videos.map( (video) => (
+                                    <div key={video.id} className="list-row">
+                                        <div>
+                                            <li key={video.id} className="list-col-grow">{video.file.name}</li>
+                                            <p className="text-xs">{video.timestamp.toLocaleTimeString()}</p>
+                                            <button className="btn btn-xs" onClick={() => toggleTimestampInput(video.id)}>Custom TimeStamp</button>
+                                            {
+                                                customTimeStamp[video.id] &&
+                                                <input className="input" type="datetime-local" step="1" onChange={(e) => handleTimeStamp(group.id, video.id, e.target.value)}/>
+                                            }
+                                        </div>
+                                        
+                                        
+                                        <button onClick={() => handleDeleteVideo(group.id, video.id)} className=" btn btn-sm">Delete</button>
+                                    </div>
+                                ))}
+                            </ul>
+                            <MediaDropZone 
+                            groupId={group.id}
+                            accept={{ "video/mp4": [".mp4"], "video/quicktime": [".mov"] }}
+                            label="Add Videos"
+                            onFiles={onFilesVideo}
+                            />
+                        </div>
+                    </div>
+                ))
+                }
+
+            
+        </div>
+    );
+}
+
+export default VideoSource;

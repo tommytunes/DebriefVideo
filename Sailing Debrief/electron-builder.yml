@@ -1,0 +1,17 @@
+appId: com.videodebrief.app
+productName: Sailing Debrief
+icon: build/DebriefIcon.png
+directories:
+  output: release
+files:
+  - dist/**/*
+  - electron/**/*
+mac:
+  category: public.app-category.video
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+nsis:
+  include: build/installer.nsh
