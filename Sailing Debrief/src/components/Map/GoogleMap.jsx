@@ -93,11 +93,11 @@ const WindHeadingInput = () => {
     );
 }
 
-const TailSlider = ({currentTime, setSliderVal}) => {
+const TailSlider = ({currentTime, sliderVal, setSliderVal}) => {
     const [showSlider, setShowSlider] = useState(false);
     return (
         <div>
-            <button className='right-2.5 top-2.5 absolute z-10' onClick={e => setShowSlider(!showSlider)}><EllipsisVertical /></button>
+            <button className='right-2.5 top-2.5 absolute z-10' value={sliderVal} onClick={e => setShowSlider(!showSlider)}><EllipsisVertical /></button>
             { showSlider &&
             <input type='range' className="range absolute z-10 top-15 right-7.5 w-64" step={10000} min={0} max={currentTime * 1000} onChange={ e => setSliderVal(e.target.value)} />
             }
@@ -110,7 +110,7 @@ const GoogleMap = ({absoluteTime}) => {
     const firstGroup = state.dataGroups[0];
     if (!firstGroup) return null;
 
-    const [tailSliderVal, setTailSliderVal] = useState(0);
+    const [tailSliderVal, setTailSliderVal] = useState(300000);
 
     const [isOnline, setIsOnline] = useState(navigator.onLine);
     useEffect(() => {
@@ -161,7 +161,7 @@ const GoogleMap = ({absoluteTime}) => {
                 <WindHeadingInput />
                 <RecenterButton center={centerData} />
             </div>
-            <TailSlider currentTime={state.currentTime} setSliderVal={setTailSliderVal} />
+            <TailSlider currentTime={state.currentTime} sliderVal={tailSliderVal} setSliderVal={setTailSliderVal} />
             {state.dataGroups.map( group => {
                 if (group === null) return;
                 const data = findTelemetryData(group.data.telemetry, absoluteTime);
@@ -189,7 +189,7 @@ const GoogleMap = ({absoluteTime}) => {
             defaultHeading={heading}
             mapId={import.meta.env.VITE_PUBLIC_GOOGLE_MAPS_ID}
             disableDefaultUI={true}
-            zoomControl={true}
+            zoomControl={!state.isPlaying}
             />
         </div>
         </APIProvider>

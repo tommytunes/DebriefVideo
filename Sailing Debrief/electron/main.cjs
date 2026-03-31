@@ -123,6 +123,12 @@ ipcMain.handle('project:load', async (_event) => {
   return { success: true, json, filePath: filePaths[0]}; // unsure for the indexing here
 })
 
+ipcMain.handle('fetch', async (_event, url) => {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return await res.json();
+})
+
 
 app.whenReady().then(() => {
   createWindow()

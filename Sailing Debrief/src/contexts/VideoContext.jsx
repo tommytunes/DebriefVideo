@@ -47,12 +47,17 @@ function videoReducer(state, action) {
             return {...state, audioGroups: deleteAudioGroups };
         
         case 'ADD_DATA_GROUP':
+            const { name, type } = action.payload;
             return {...state, dataGroups:[...state.dataGroups, {
                 id: crypto.randomUUID(),
-                name: action.payload,
+                name: name,
+                type: type,
                 data: {}
             }
             ]};
+
+        case 'REPLACE_DATA_GROUP':
+            return {...state, dataGroups: action.payload};
         
         case 'DELETE_DATA_GROUP':
             const deletedDataGroups = state.dataGroups.filter(group =>

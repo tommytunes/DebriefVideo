@@ -14,7 +14,7 @@ const DataSource = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        dispatch({type: 'ADD_DATA_GROUP', payload: inputValue});
+        dispatch({type: 'ADD_DATA_GROUP', payload: {name: inputValue, type: 'boat'}});
         setInputValue('');
     };
 

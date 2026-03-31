@@ -8,5 +8,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
   saveProject: (jsonString, filePath) => ipcRenderer.invoke('project:save', jsonString),
   loadProject: () => ipcRenderer.invoke('project:load'),
   onMenuSave: (cb) => ipcRenderer.on('menu:saveProject', cb),
-  onMenuLoad: (cb) => ipcRenderer.on('menu:loadProject', cb)
+  onMenuLoad: (cb) => ipcRenderer.on('menu:loadProject', cb),
+  fetchUrl: (url) => ipcRenderer.invoke('fetch', url)
 })
