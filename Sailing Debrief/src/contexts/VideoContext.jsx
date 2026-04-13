@@ -52,6 +52,7 @@ function videoReducer(state, action) {
                 id: crypto.randomUUID(),
                 name: name,
                 type: type,
+                show: false,
                 data: {}
             }
             ]};
@@ -206,6 +207,12 @@ function videoReducer(state, action) {
         
         case 'SET_SIDEBAR':
             return {...state, sideBarHeight: action.payload};
+        
+        case 'SET_DATA_SHOW':
+            const newDataGroupsShow = state.dataGroups.map( group =>
+                group.id === action.payload ? {...group, show: !group.show} : group
+            );
+            return {...state, dataGroups: newDataGroupsShow};
         
         default:
             return state;

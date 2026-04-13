@@ -3,7 +3,7 @@ async function fetchStartEndTime(eventId, division) {
     const url = 
     `https://teleapi.regatta.app/telemetry/event-times/${eventId}?division=${division}`
 
-    const json = await window.electronAPI.fetch(url);
+    const json = await window.electronAPI.fetchUrl(url);
 
     return {start: json.time_ranges[0].begin, end: json.time_ranges[0].end}
 }
@@ -51,18 +51,18 @@ export async function fetchNewDataGroup({eventId, division, limit = 100000}) {
     const url = 
     `https://teleapi.regatta.app/telemetry/event/${eventId}?after=${start}&before=${end}&division=${division}&limit=${limit}`
 
-    const json = await window.electronAPI.fetch(url);
+    const json = await window.electronAPI.fetchUrl(url);
 
     let telemetry = json.Rows; // implement proper parsing to dataGroup format maybe write a seperate function 
 
     let newRows = json.Rows;
 
     while (newRows.length === limit ) {
-        const newTimeStamp = telemetry[telemetry.length - 1].timestamp;
+        const newTimeStamp = telemetry[telemetry.length - 1][0];
         const newUrl = 
         `https://teleapi.regatta.app/telemetry/event/${eventId}?after=${newTimeStamp}&before=${end}&division=${division}&limit=${limit}`
 
-        const newJsonData = await window.electronAPI.fetch(newUrl);
+        const newJsonData = await window.electronAPI.fetchUrl(newUrl);
         
         newRows = newJsonData.Rows;
 

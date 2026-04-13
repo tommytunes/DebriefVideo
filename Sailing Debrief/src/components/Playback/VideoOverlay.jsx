@@ -10,11 +10,14 @@ const VideoOverlay = ({absoluteTime}) => {
     return (
         <>
         { state.dataGroups.length > 0 &&
-            <div className='absolute top-2 left-2 flex flex-col gap-2'>
+            <div className='absolute top-2 left-2 bottom-2 flex flex-col flex-wrap gap-2'>
             {state.dataGroups.map((group) => {
+                const [telemetry, setTelemetry] = useState({speed: true, heel: true, heading: true, pitch: true})
+                if (!group.show) return;
+                if (group.type === 'mark') return;
                 const data = findTelemetryData(group.data.telemetry, absoluteTime);
                 if (data === null) return;
-                const [telemetry, setTelemetry] = useState({speed: true, heel: true, heading: true, pitch: true})
+                
                 return ( 
                         <div key={group.id} className="bg-gray-500 text-white text-xl font-bold px-2 py-1 rounded">
                             <div className='flex flex-row justify-between'>

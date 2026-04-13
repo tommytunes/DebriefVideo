@@ -7,6 +7,7 @@ import { useMasterClock } from '../../hooks/useMasterClock';
 import VideoOverlay from './VideoOverlay';
 import GoogleMap from '../Map/GoogleMap';
 import { Video } from 'lucide-react';
+import VideoOverlaySelection from '../../components/PlayerOptions/VideoOverlaySelection';
 
 const VideoPlayback = () => {
     const { state, dispatch } = useVideo();
@@ -141,6 +142,9 @@ const VideoPlayback = () => {
             muted={group1.muted}
             />
             <VideoOverlay absoluteTime={absoluteTime}/>
+            <div className='absolute top-2 right-2'>
+                <VideoOverlaySelection />
+            </div>
         </div>
 
         :
@@ -162,7 +166,7 @@ const VideoPlayback = () => {
             <GoogleMap absoluteTime={absoluteTime}/>
         </div> :
         (!isGap2 && video2) && (splitRatio < 1) ?
-        <div key="video2" className="h-full w-full bg-black overflow-hidden" style={{width: `${(1 - splitRatio) * 100}%`}}>
+        <div key="video2" className="relative h-full w-full bg-black overflow-hidden" style={{width: `${(1 - splitRatio) * 100}%`}}>
             <video
             ref={videoRef2}
             src={video2.url}
@@ -170,6 +174,10 @@ const VideoPlayback = () => {
             preload='auto'
             muted={group2.muted}
             />
+            <VideoOverlay absoluteTime={absoluteTime}/>
+            <div className='absolute top-2 right-2'>
+                <VideoOverlaySelection />
+            </div>
         </div> :
 
         

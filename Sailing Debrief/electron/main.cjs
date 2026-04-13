@@ -61,7 +61,8 @@ function createAppMenu() {
         { label: 'Save Project', accelerator: 'CmdOrCtrl+S', click: () => win.webContents.send('menu:saveProject') },
         { label: 'Open Project', accelerator: 'CmdOrCtrl+O', click: () => win.webContents.send('menu:loadProject') },
       ]
-    }
+    },
+    { role: 'editMenu' },
   ];
   const menu = Menu.buildFromTemplate(template);
   Menu.setApplicationMenu(menu);
