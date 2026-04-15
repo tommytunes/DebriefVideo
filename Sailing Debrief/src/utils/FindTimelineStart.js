@@ -1,6 +1,6 @@
 
-export function FindTimelineStart(videoGroups, audioGroups) {
-    if (videoGroups.length === 0 && audioGroups.length === 0) return 0;
+export function FindTimelineStart(videoGroups, audioGroups, dataGroups) {
+    if (videoGroups.length === 0 && audioGroups.length === 0 && dataGroups.length === 0) return 0;
 
     let timelineStart = Infinity;
 
@@ -23,6 +23,17 @@ export function FindTimelineStart(videoGroups, audioGroups) {
             timelineStart = timelinePrelim;
         }
     });
+
+    dataGroups.forEach( group => {
+        if (!group.data?.telemetry || group.data?.telemetry.length === 0) return;
+
+        const timelinePrelim = Number(group.data?.telemetry[0].timestamp);
+        const hasMedia = videoGroups.length !== 0 || audioGroups.length !== 0;
+        if (timelineStart > timelinePrelim && !hasMedia) {
+            timelineStart = timelinePrelim;
+        }
+    });
+
 
     return timelineStart;
 };

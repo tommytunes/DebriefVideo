@@ -65,7 +65,7 @@ const DataSource = () => {
             } catch (err) {
                 console.error('[DataSource] GPS parse error for', file.name, err);
             }
-            return { id: crypto.randomUUID(), file, url: 'file://' + file._filePath, telemetry };
+            return { id: crypto.randomUUID(), file, url: 'file://' + file._filePath, source: 'filesystem', telemetry };
         }));
         dispatch({ type: 'ADD_DATA', payload: { data, groupId } });
     };
@@ -113,23 +113,27 @@ const DataSource = () => {
                                 <button onClick={() => handleDeleteGroup(group.id)} className="btn btn-sm">Delete Group</button>
                             </div>
                             <ul key={group.id} className="list">
-                                {group.data?.file &&
+                                {(group.data?.file || group.data?.source === 'racesense') &&
                                     <div key={group.data.id} className="list-row">
                                         <div>
-                                            <li key={group.data.id} className="list-col-grow">{group.data.file.name}</li>
+                                            {group.data?.source === 'filesystem' ?
+                                            <li key={group.data.id} className="list-col-grow">{group.data.file.name}</li> :
+                                            <li key={group.data.id} className="list-col-grow">Data from Racesense tracking</li> 
+                                            }
                                         </div>
                                         <button onClick={() => handleDeleteData(group.id)} className=" btn btn-sm">Delete</button>
                                     </div>
                                 }
                             </ul>
-                            {!group.data?.file &&
-                                <MediaDropZone 
+                            {!group.data?.file && (group.data?.source !== 'racesense') &&
+                            <MediaDropZone 
                                 groupId={group.id}
                                 accept={{ "application/octet-stream": [".vkx"] }}
                                 label="Add Data"
                                 onFiles={onFilesData}
                                 multiple={false}
                             />
+                                
                             }
                         </div>
                     </div>

@@ -8,7 +8,7 @@ import { useRef, useEffect } from 'react';
 const AudioPlayback = () => {
     
     const { state, dispatch } = useVideo();
-    const timelineStart = FindTimelineStart(state.videoGroups, state.audioGroups);
+    const timelineStart = FindTimelineStart(state.videoGroups, state.audioGroups, state.dataGroups);
     const audioRefs = useRef({});
     const { isPlaying } = usePlayback();
     const currentTimeRef = useRef(state.currentTime);

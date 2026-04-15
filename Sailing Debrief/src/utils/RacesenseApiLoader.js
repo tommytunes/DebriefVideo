@@ -38,7 +38,7 @@ function jsonToDataGroup(jsonRows) {
             {id: crypto.randomUUID(),
             name: info[0].sailNum,
             type: info[0].type,
-            data: {id: crypto.randomUUID(), file: null, url: null , telemetry}})
+            data: {id: crypto.randomUUID(), file: null, url: null , source: 'racesense', telemetry}})
     });
 
     return dataGroup;

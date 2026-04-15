@@ -1,6 +1,7 @@
+import { AlignVerticalSpaceAroundIcon } from "lucide-react";
 
-export function FindTimelineEnd(videoGroups, audioGroups) {
-    if (videoGroups.length === 0 && audioGroups === 0) return 0;
+export function FindTimelineEnd(videoGroups, audioGroups, dataGroups) {
+    if (videoGroups.length === 0 && audioGroups.length === 0 && dataGroups.length === 0) return 0;
 
     let latest = 0;
 
@@ -22,6 +23,17 @@ export function FindTimelineEnd(videoGroups, audioGroups) {
                 latest = audioTime;
             }
         })
+    })
+
+    dataGroups.forEach( group => {
+        const tel = group.data?.telemetry;
+        if (!tel || tel.length === 0) return;
+
+        const dataTime = Number(tel[tel.length - 1].timestamp)
+        const hasMedia = videoGroups.length !== 0 || audioGroups.length !== 0;
+        if (dataTime > latest && !hasMedia) {
+            latest = dataTime;
+        }
     })
     return latest;
 }

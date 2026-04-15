@@ -35,7 +35,7 @@ const VideoPlayback = () => {
 
     const handlePointerUp = () => { isDragging.current = false; };
 
-    const timelineStart = FindTimelineStart(state.videoGroups, state.audioGroups);
+    const timelineStart = FindTimelineStart(state.videoGroups, state.audioGroups, state.dataGroups);
     const absoluteTime = timelineStart + (state.currentTime * 1000);
     const timelineStartRef = useRef(timelineStart);
     const isSeekingRef = useRef(state.isSeeking.seeking);
@@ -149,10 +149,14 @@ const VideoPlayback = () => {
 
         :
 
-        <div key="gap1" className="h-full w-full bg-black overflow-hidden" style={{width: `${splitRatio * 100}%`}}>
+        <div key="gap1" className="h-full w-full bg-black overflow-hidden relative" style={{width: `${splitRatio * 100}%`}}>
             <video
             className="w-full h-full object-contain"
             />
+            <VideoOverlay absoluteTime={absoluteTime}/>
+            <div className='absolute top-2 right-2'>
+                <VideoOverlaySelection />
+            </div>
         </div>
         
     }
@@ -181,10 +185,14 @@ const VideoPlayback = () => {
         </div> :
 
         
-        <div key="gap2" className="h-full w-full bg-black overflow-hidden" style={{width: `${(1 - splitRatio) * 100}%`}}>
+        <div key="gap2" className="h-full w-full bg-black overflow-hidden relative" style={{width: `${(1 - splitRatio) * 100}%`}}>
             <video
             className="w-full h-full object-contain"
             />
+            <VideoOverlay absoluteTime={absoluteTime}/>
+            <div className='absolute top-2 right-2'>
+                <VideoOverlaySelection />
+            </div>
         </div>
         }
         </div>

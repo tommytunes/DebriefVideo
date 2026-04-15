@@ -5,7 +5,7 @@ import { FindTimelineStart } from "../../utils/FindTimelineStart";
 
 export function NavBar() {
     const { state } = useVideo();
-    const timelineStart = FindTimelineStart(state.videoGroups, state.audioGroups);
+    const timelineStart = FindTimelineStart(state.videoGroups, state.audioGroups, state.dataGroups);
     return(
         <div className="navbar bg-base-100 shadow-sm">
             <div className="navbar-start">
