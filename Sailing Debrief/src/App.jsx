@@ -1,4 +1,4 @@
-import VideoPlayback from "./components/Playback/VideoPlayback";
+import VideoPlayback from "./components/Playback/SourcePlayback";
 import VideoSource from "./components/MediaSources/VideoSource";
 import NavBar from "./components/NavBar/NavBar";
 import TimelineEditor from "./components/Timeline/Timeline";

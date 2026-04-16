@@ -19,7 +19,7 @@ const VideoOverlay = ({absoluteTime}) => {
                 if (data === null) return;
                 
                 return ( 
-                        <div key={group.id} className="bg-gray-500 text-white text-xl font-bold px-2 py-1 rounded">
+                        <div key={group.id} className="bg-gray-500/60 text-white text-xl font-bold px-2 py-1 rounded">
                             <div className='flex flex-row justify-between'>
                                 <p>{group.name}</p>
                                 <TelemetrySelection state={telemetry} setState={setTelemetry}/>

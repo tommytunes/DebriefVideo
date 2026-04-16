@@ -7,7 +7,8 @@ import { useMasterClock } from '../../hooks/useMasterClock';
 import VideoOverlay from './VideoOverlay';
 import GoogleMap from '../Map/GoogleMap';
 import { Video } from 'lucide-react';
-import VideoOverlaySelection from '../../components/PlayerOptions/VideoOverlaySelection';
+import VideoOverlaySelection from '../PlayerOptions/VideoOverlaySelection';
+import TelemetryGraphs from '../Graphs/TelemetryGraphs';
 
 const VideoPlayback = () => {
     const { state, dispatch } = useVideo();
@@ -132,6 +133,11 @@ const VideoPlayback = () => {
         <div key="map1" className="relative h-full w-full bg-black overflow-hidden" style={{width: `${splitRatio * 100}%`}}>
             <GoogleMap absoluteTime={absoluteTime}/>
         </div> :
+        state.groupIdVideo1 === 'graph' ?
+        <div className="relative h-full w-full overflow-hidden" style={{width: `${splitRatio * 100}%`}}> 
+        <TelemetryGraphs />
+        </div>
+        :
         (!isGap1 && video1) && (splitRatio > 0) ?
         <div key="video1" className="relative h-full w-full bg-black overflow-hidden" style={{width: `${splitRatio * 100}%`}}>
             <video
@@ -169,6 +175,13 @@ const VideoPlayback = () => {
         <div key="map2" className="h-full w-full bg-black overflow-hidden" style={{width: `${(1 - splitRatio) * 100}%`}}>
             <GoogleMap absoluteTime={absoluteTime}/>
         </div> :
+
+        state.groupIdVideo2 === 'graph' ?
+        <div className="h-full w-full overflow-hidden" style={{width: `${(1 - splitRatio) * 100}%`}}>
+        <TelemetryGraphs />
+        </div>
+         :
+
         (!isGap2 && video2) && (splitRatio < 1) ?
         <div key="video2" className="relative h-full w-full bg-black overflow-hidden" style={{width: `${(1 - splitRatio) * 100}%`}}>
             <video

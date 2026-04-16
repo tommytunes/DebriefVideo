@@ -11,7 +11,7 @@ const GroupSelection = ({groups, type, label}) => {
         <div className="flex flex-col">
         <div className="p-2">
             <label>
-                Choose {label} Source 1: 
+                Choose Source 1: 
                 <select onChange={handleOnChange1}>
                     <option value="">-- Select --</option>
                     {groups.length === 0 ? 
@@ -20,13 +20,14 @@ const GroupSelection = ({groups, type, label}) => {
                         <option key={group.id} value={group.id}>{group.name}</option>
                     ))}
                     <option key={"map"} value="map">Boat Track</option>
+                    <option key={"graph"} value="graph">Telemetry Graphs</option>
                 </select>
             </label>
             </div>
 
             <div className="p-2">
                 <label>
-                Choose {label} Source 2: 
+                Choose Source 2: 
                     <select onChange={handleOnChange2}>
                         <option value="">-- Select --</option>
                         {groups.length === 0 ? 
@@ -35,6 +36,7 @@ const GroupSelection = ({groups, type, label}) => {
                             <option key={group.id} value={group.id}>{group.name}</option>
                         ))}
                         <option key={"map"} value="map">Boat Track</option>
+                        <option key={"graph"} value="graph">Telemetry Graphs</option>
                     </select>
                 </label>
             </div>
