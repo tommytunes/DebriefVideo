@@ -135,7 +135,7 @@ const VideoPlayback = () => {
         </div> :
         state.groupIdVideo1 === 'graph' ?
         <div className="relative h-full w-full overflow-hidden" style={{width: `${splitRatio * 100}%`}}> 
-        <TelemetryGraphs />
+        <TelemetryGraphs absoluteTime={absoluteTime}/>
         </div>
         :
         (!isGap1 && video1) && (splitRatio > 0) ?
@@ -178,7 +178,7 @@ const VideoPlayback = () => {
 
         state.groupIdVideo2 === 'graph' ?
         <div className="h-full w-full overflow-hidden" style={{width: `${(1 - splitRatio) * 100}%`}}>
-        <TelemetryGraphs />
+        <TelemetryGraphs absoluteTime={absoluteTime}/>
         </div>
          :
 
