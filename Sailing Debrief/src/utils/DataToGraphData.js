@@ -1,20 +1,16 @@
 import { findTelemetryRange } from "./FindTelemetryData";
-import { PALETTE, hash } from "../constants/Palette";
+import { PALETTE } from "../constants/Palette";
 
-export function dataToGraphDataHeel(dataGroups, absoluteTime, windowMs) {
+export function dataToGraphData(dataGroups, absoluteTime, windowMs, metric) {
     const groups = dataGroups.filter(
         g => g.type !== 'mark' && g.data?.telemetry?.length
     );
 
     if (groups.length === 0) return { rows: [], series: [] };
 
-    const windowStart = BigInt(Math.floor(absoluteTime)) - BigInt(Math.floor(windowMs));
-
-    const series = groups.map(g => {
-                                                                                       
-        const color = PALETTE[hash(g.id) % PALETTE.length];
-
-        return { key: g.id, name: g.name, color: color}
+    const series = groups.filter(g => g.show).map((g, i) => {
+        const color = PALETTE[i % PALETTE.length];
+        return { key: g.id, name: g.name, color: color };
     });
 
     const rowsByT = new Map();
@@ -30,7 +26,7 @@ export function dataToGraphDataHeel(dataGroups, absoluteTime, windowMs) {
                 for (const s of series) row[s.key] = null;
                 rowsByT.set(t, row);
             }
-            row[group.id] = sample.heel;
+            row[group.id] = sample[metric];
         }
     }
 

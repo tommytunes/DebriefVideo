@@ -22,7 +22,8 @@ export function useMasterClock(isPlaying, dispatch, timelineStartRef, clockSourc
         let clockVideo = null;
 
         for (const source of clockSources.current){
-            if (!source.isGap && source.videoRef.current) {
+            const videoRef = source.videoRef.current;
+            if (!source.isGap && videoRef && !videoRef.ended && !videoRef.paused) {
                 clockVideo = source;
                 break;
             }

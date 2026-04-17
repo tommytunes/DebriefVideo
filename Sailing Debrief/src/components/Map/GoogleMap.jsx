@@ -110,7 +110,7 @@ const GoogleMap = ({absoluteTime}) => {
     const firstGroup = state.dataGroups[0];
     if (!firstGroup) return null;
 
-    const [tailSliderVal, setTailSliderVal] = useState(300000);
+    const [tailSliderVal, setTailSliderVal] = useState(120_000);
 
     const [isOnline, setIsOnline] = useState(navigator.onLine);
     useEffect(() => {

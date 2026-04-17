@@ -6,7 +6,7 @@ const VideoOverlaySelection = () => {
 
     return (
         <div className="dropdown dropdown-end pt-1.5">
-            <button tabIndex={0}><ChevronDown className="text-amber-500"/></button>
+            <button tabIndex={0}><ChevronDown className="text-blue-500"/></button>
             <div tabIndex={0} className="dropdown-content card card-compact p-2 shadow bg-base-100 w-40">
                 <div className="flex flex-col max-h-48 overflow-y-auto">
                 {state.dataGroups.map( group => {
