@@ -11,7 +11,9 @@ const initialState = {
     isDragging: false,
     sideBarHeight: 0,
     groupIdVideo1: null,
-    groupIdVideo2: null
+    groupIdVideo2: null,
+    windowMsGraph: 30_000,
+    graphSelection: {heel: true, speed: true, heading: false, pitch: false}
 };
 
 function videoReducer(state, action) {
@@ -213,6 +215,13 @@ function videoReducer(state, action) {
                 group.id === action.payload ? {...group, show: !group.show} : group
             );
             return {...state, dataGroups: newDataGroupsShow};
+        
+        case 'SET_WINDOW_GRAPH':
+            return {...state, windowMsGraph: action.payload}
+        
+        case 'SET_SHOW_GRAPH':
+            const newGraphSelection = {...state.graphSelection, [action.payload] : !state.graphSelection[action.payload] }
+            return {...state, graphSelection: newGraphSelection};
         
         default:
             return state;

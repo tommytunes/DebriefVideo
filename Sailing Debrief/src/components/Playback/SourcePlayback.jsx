@@ -9,6 +9,7 @@ import GoogleMap from '../Map/GoogleMap';
 import { Video } from 'lucide-react';
 import VideoOverlaySelection from '../PlayerOptions/VideoOverlaySelection';
 import TelemetryGraphs from '../Graphs/TelemetryGraphs';
+import GraphOptions from '../Graphs/GraphOptions';
 
 const VideoPlayback = () => {
     const { state, dispatch } = useVideo();
@@ -134,8 +135,11 @@ const VideoPlayback = () => {
             <GoogleMap absoluteTime={absoluteTime}/>
         </div> :
         state.groupIdVideo1 === 'graph' ?
-        <div className="relative h-full w-full overflow-hidden" style={{width: `${splitRatio * 100}%`}}> 
+        <div className="relative h-full w-full overflow-hidden relative" style={{width: `${splitRatio * 100}%`}}> 
         <TelemetryGraphs absoluteTime={absoluteTime}/>
+        <div className='absolute top-2 right-2'>
+            <GraphOptions />
+        </div>
         </div>
         :
         (!isGap1 && video1) && (splitRatio > 0) ?
@@ -177,8 +181,11 @@ const VideoPlayback = () => {
         </div> :
 
         state.groupIdVideo2 === 'graph' ?
-        <div className="h-full w-full overflow-hidden" style={{width: `${(1 - splitRatio) * 100}%`}}>
+        <div className="h-full w-full overflow-hidden relative" style={{width: `${(1 - splitRatio) * 100}%`}}>
         <TelemetryGraphs absoluteTime={absoluteTime}/>
+        <div className='absolute top-2 right-2'>
+            <GraphOptions />
+        </div>
         </div>
          :
 
