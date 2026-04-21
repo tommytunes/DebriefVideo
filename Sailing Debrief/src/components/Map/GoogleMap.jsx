@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
     APIProvider,
     Map,
@@ -10,17 +10,18 @@ import {
 import { findTelemetryData, findTelemetryRange, calculateBearing } from '../../utils/FindTelemetryData';
 import { useVideo } from '../../contexts/VideoContext';
 import { EllipsisVertical } from 'lucide-react';
+import { PALETTE } from '../../constants/Palette';
 
 
-const SailboatMarker = ({position, heading, mapHeading, name }) => (
+const SailboatMarker = ({position, heading, mapHeading, name, color }) => (
     <AdvancedMarker position={position} anchorPoint={AdvancedMarkerAnchorPoint.CENTER}>
         <div className='relative'>
             <div className='absolute m-5'>
                 <p>{name}</p>
             </div>
             <div style={{ transform: `rotate(${heading - mapHeading}deg)`, transformOrigin: 'center' }}>
-            <svg width="28" height="28" viewBox='0 0 28 28' fill='white'>
-                <path d="M14,3 L22,21 Q14,17 6,21 Z" strokeLinejoin="round" strokeLinecap="round" stroke="white" strokeWidth="1.5" />
+            <svg width="28" height="28" viewBox='0 0 28 28' fill={color}>
+                <path d="M14,3 L22,21 Q14,17 6,21 Z" strokeLinejoin="round" strokeLinecap="round" stroke={color} strokeWidth="1.5" />
             </svg>
         </div>
         </div>
@@ -30,17 +31,29 @@ const SailboatMarker = ({position, heading, mapHeading, name }) => (
 
 const BoatTrail = ({ path, color }) => {
      const map = useMap();
+     const polylineRef = useRef(null);
      useEffect(() => {
-         if (!map || path.length < 2) return;
-         const polyline = new google.maps.Polyline({
+         if (!map) return;
+            polylineRef.current = new google.maps.Polyline({
              path,
              strokeColor: color || '#4285F4',
              strokeOpacity: 0.8,
              strokeWeight: 3,
              map,
          });
-         return () => polyline.setMap(null); // cleanup
-     }, [map, path, color]);
+         return () => {
+            polylineRef.current?.setMap(null)
+            polylineRef.current = null}; // cleanup
+     }, [map, color]);
+
+     useEffect(() => {
+        if (!polylineRef.current) return;
+        if (path.length < 2) {
+            polylineRef.current.setPath([]);
+            return;
+        }
+        polylineRef.current.setPath(path);
+     }, [path]);
      return null;
  };
 
@@ -49,7 +62,6 @@ const RecenterButton = ({ center }) => {
     const handleRecenter = () => {
         if (!map) return;
         map.panTo(center);
-        //map.setHeading(heading)
     };
     return (
         <button
@@ -162,7 +174,7 @@ const GoogleMap = ({absoluteTime}) => {
                 <RecenterButton center={centerData} />
             </div>
             <TailSlider currentTime={state.currentTime} sliderVal={tailSliderVal} setSliderVal={setTailSliderVal} />
-            {state.dataGroups.map( group => {
+            {state.dataGroups.map( (group, i) => {
                 if (group === null) return;
                 const data = findTelemetryData(group.data.telemetry, absoluteTime);
                 const trailPoints = findTelemetryRange(group.data.telemetry, absoluteTime, tailSliderVal);
@@ -178,8 +190,8 @@ const GoogleMap = ({absoluteTime}) => {
                     : data.heading;
                 return (
                 <>
-                    <BoatTrail key={`trail-${group.id}`} path={path} color={'red'} />
-                    <SailboatMarker key={group.id} position={{lat: data.latitude, lng: data.longitude}} heading={trailHeading} mapHeading={mapHeading} name={group.name}/>
+                    <BoatTrail key={`trail-${group.id}`} path={path} color={PALETTE[i % PALETTE.length]} />
+                    <SailboatMarker key={group.id} position={{lat: data.latitude, lng: data.longitude}} heading={trailHeading} mapHeading={mapHeading} name={group.name} color={PALETTE[i % PALETTE.length]}/>
                 </>);
             })}
             <Map
@@ -189,7 +201,7 @@ const GoogleMap = ({absoluteTime}) => {
             defaultHeading={heading}
             mapId={import.meta.env.VITE_PUBLIC_GOOGLE_MAPS_ID}
             disableDefaultUI={true}
-            zoomControl={!state.isPlaying}
+            zoomControl={false}
             />
         </div>
         </APIProvider>
