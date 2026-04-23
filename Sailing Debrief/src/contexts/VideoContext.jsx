@@ -1,5 +1,6 @@
 import { Stethoscope } from "lucide-react";
 import { createContext, useContext, useReducer } from "react";
+import { resolveTimestamp } from "../utils/MetaData";
 
 const initialState = {
     videoGroups: [],
@@ -13,7 +14,8 @@ const initialState = {
     groupIdVideo1: null,
     groupIdVideo2: null,
     windowMsGraph: 30_000,
-    graphSelection: {heel: true, speed: true, heading: false, pitch: false}
+    graphSelection: {heel: true, speed: true, heading: false, pitch: false},
+    map: {tailLength: 120_000, windDirection: 0}
 };
 
 function videoReducer(state, action) {
@@ -139,7 +141,7 @@ function videoReducer(state, action) {
             const {videoGroupId, videoId, newVideoTimeStamp} = action.payload;
             const newVideoTimeStampGroups = state.videoGroups.map( group =>
                 group.id === videoGroupId
-                ? {...group, videos: group.videos.map( video => 
+                ? {...group, videos: group.videos.map( video =>
                     video.id === videoId ?
                     {...video, timestamp: newVideoTimeStamp} :
                     video
@@ -147,6 +149,42 @@ function videoReducer(state, action) {
             );
 
             return {...state, videoGroups: newVideoTimeStampGroups};
+
+        case 'SET_TIMESTAMP_SOURCE': {
+            const { groupId: tsGroupId, videoId: tsVideoId, sourceKey, manualValue } = action.payload;
+            const updatedGroups = state.videoGroups.map(group => {
+                if (group.id !== tsGroupId) return group;
+                const newVideos = group.videos.map(video => {
+                    if (video.id !== tsVideoId) return video;
+                    if (!video.allSources) return { ...video, timestampSource: sourceKey };
+                    const all = { sources: video.allSources, duration: video.duration ?? 0, hints: video.hints ?? {} };
+                    const ts = resolveTimestamp(all, { sourceKey, manualValue }) ?? video.timestamp;
+                    return {
+                        ...video,
+                        timestamp: ts,
+                        timestampSource: sourceKey,
+                        manualValue: manualValue ?? null
+                    };
+                }).sort((a, b) => a.timestamp - b.timestamp);
+                return { ...group, videos: newVideos };
+            });
+            return { ...state, videoGroups: updatedGroups };
+        }
+
+        case 'SET_TIMESTAMP_VARIATION_VIDEO':
+            const { groupId: videoGroupid, videoId: vidId, timestampVariation } = action.payload;
+            const newTsVideoGroups = state.videoGroups.map(group => {
+                if (group.id !== videoGroupid) return group;
+                const newVideos = group.videos.map(video => {
+                    if (video.id !== vidId) return video;
+                    return {
+                        ...video,
+                        timestamp: new Date(video.timestamp.getTime() + timestampVariation * 1000)
+                    }
+                });
+                return { ...group, videos: newVideos };
+            });
+            return { ...state, videoGroups: newTsVideoGroups };
         
         case 'SET_TIMESTAMP_AUDIO':
             const {audioGroupId, audioId, newAudioTimeStamp} = action.payload;
@@ -222,6 +260,12 @@ function videoReducer(state, action) {
         case 'SET_SHOW_GRAPH':
             const newGraphSelection = {...state.graphSelection, [action.payload] : !state.graphSelection[action.payload] }
             return {...state, graphSelection: newGraphSelection};
+
+        case 'SET_TAIL_LENGTH':
+            return {...state, map: {...state.map, tailLength: action.payload}};
+        
+        case 'SET_WIND_DIRECTION':
+            return {...state, map: {...state.map, windDirection: action.payload}};
         
         default:
             return state;

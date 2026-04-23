@@ -110,6 +110,20 @@ ipcMain.handle('fs:readFileBuffer', async (_event, filePath) => {
   return fs.promises.readFile(filePath);
 })
 
+ipcMain.handle('fs:fileExists', async (_event, filePath) => {
+  try {
+    await fs.promises.access(filePath, fs.constants.R_OK);
+    return true;
+  } catch {
+    return false;
+  }
+})
+
+ipcMain.handle('fs:readFileStat', async (_event, filePath) => {
+  const s = await fs.promises.stat(filePath);
+  return { mtimeMs: s.mtimeMs, birthtimeMs: s.birthtimeMs, size: s.size };
+})
+
 ipcMain.handle('project:save', async (_event, jsonString) => {
   const { canceled, filePath } = await dialog.showSaveDialog(win, { defaultPath: 'project.debrief', filters: [{ name: 'Debrief Project', extensions: ['debrief'] }] });
   if (canceled) return {success: false};

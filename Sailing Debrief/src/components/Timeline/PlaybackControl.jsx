@@ -22,6 +22,8 @@ const PlaybackControl = () => {
 
     useEffect(() => {
         const handleKeyDown = (event) => {
+            const tag = document.activeElement?.tagName;
+            if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
             if (event.code === "Space") {
                 event.preventDefault();
                 if (isPlayingRef.current) {

@@ -10,6 +10,7 @@ import { Video } from 'lucide-react';
 import VideoOverlaySelection from '../PlayerOptions/VideoOverlaySelection';
 import TelemetryGraphs from '../Graphs/TelemetryGraphs';
 import GraphOptions from '../Graphs/GraphOptions';
+import VideoTimestampVariation from './VideoTimestampVariation';
 
 const VideoPlayback = () => {
     const { state, dispatch } = useVideo();
@@ -155,6 +156,7 @@ const VideoPlayback = () => {
             <div className='absolute top-2 right-2'>
                 <VideoOverlaySelection />
             </div>
+            <VideoTimestampVariation videoId={video1.id} groupId={state.groupIdVideo1}/>
         </div>
 
         :
@@ -202,6 +204,7 @@ const VideoPlayback = () => {
             <div className='absolute top-2 right-2'>
                 <VideoOverlaySelection />
             </div>
+            <VideoTimestampVariation videoId={video2.id} groupId={state.groupIdVideo2}/>
         </div> :
 
         

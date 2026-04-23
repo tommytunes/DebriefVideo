@@ -1,13 +1,38 @@
-import { extractMetaDataGPS } from "./MetaDataGPS";
+import { extractAllTimestampSources, resolveTimestamp, pickAuto } from "./MetaData";
+
+async function rehydrateVideo(v) {
+    const file = v.file;
+    if (!file?._filePath) {
+        return { ...v, timestamp: new Date(v.timestamp) };
+    }
+    try {
+        const all = await extractAllTimestampSources(file);
+        const sourceKey = v.timestampSource ?? pickAuto(all);
+        const manualValue = v.manualValue ? new Date(v.manualValue) : null;
+        const ts = resolveTimestamp(all, { sourceKey, manualValue }) ?? new Date(v.timestamp);
+        return {
+            ...v,
+            timestamp: ts,
+            duration: all.duration,
+            allSources: all.sources,
+            hints: all.hints,
+            timestampSource: sourceKey,
+            manualValue
+        };
+    } catch (e) {
+        console.warn('[ProjectDeSerializer] re-extract failed for', file.name, e);
+        return { ...v, timestamp: new Date(v.timestamp) };
+    }
+}
 
 export async function projectDeSerializer(json) {
     const state = JSON.parse(json);
 
-
-    const newVideoGroups = state.videoGroups.map( vg => ({
+    const newVideoGroups = await Promise.all(state.videoGroups.map(async vg => ({
         ...vg,
-        videos: vg.videos.map(v => ({ ...v, timestamp: new Date(v.timestamp)}))
-    }));
+        videos: (await Promise.all(vg.videos.map(rehydrateVideo)))
+            .sort((a, b) => a.timestamp - b.timestamp)
+    })));
 
     const newAudioGroups = state.audioGroups.map( ag => ({
         ...ag,
@@ -15,7 +40,7 @@ export async function projectDeSerializer(json) {
     }));
 
     const newDataGroups = state.dataGroups.map(  dg => {
-        
+
         return {
             ...dg,
             data: {
@@ -27,6 +52,6 @@ export async function projectDeSerializer(json) {
             }
         }
     })
-    
+
     return {...state, videoGroups: newVideoGroups, audioGroups: newAudioGroups, dataGroups: newDataGroups};
 };

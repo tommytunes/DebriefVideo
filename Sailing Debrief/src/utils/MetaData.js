@@ -1,93 +1,137 @@
 import * as MP4Box from 'mp4box'
+import { getGpmfFirstGpsu, getDjiSrtTimestamp } from './TelemetryTimestamp'
 
-/**
- * Extract the Apple QuickTime creation date from the meta > keys > ilst box structure.
- * This is the actual recording date, preserved even after AirDrop/iCloud transfer.
- */
-function extractAppleCreationDate(mp4boxfile) {
+// ---------- per-source extractors ----------
+// Each returns { available: boolean, value: Date | null, label: string }
+
+const SRC = (label, value) => ({
+    label,
+    value: value instanceof Date && !isNaN(value.getTime()) ? value : null,
+    available: value instanceof Date && !isNaN(value.getTime())
+});
+
+function getApple(mp4boxfile) {
     try {
-        // meta is a direct child of moov in QuickTime files (not under udta)
         const meta = mp4boxfile.moov?.meta ?? mp4boxfile.moov?.udta?.meta;
-        if (!meta?.keys?.keys || !meta?.ilst?.list) return null;
+        if (!meta?.keys?.keys || !meta?.ilst?.list) return SRC('QuickTime Creation', null);
 
-        // keys.keys is { 1: "mdtacom.apple.quicktime.creationdate", ... }
-        // Key strings include the 4-byte namespace prefix (e.g. "mdta")
         for (const [index, keyName] of Object.entries(meta.keys.keys)) {
             if (!keyName.includes('com.apple.quicktime.creationdate')) continue;
-
             const entry = meta.ilst.list[index];
             if (!entry) continue;
-
-            // entry may BE the data box (.value) or contain one (.data.value)
             const dateStr = entry.value ?? entry.data?.value;
             if (typeof dateStr !== 'string') continue;
-
-            const date = new Date(dateStr.trim());
-            if (!isNaN(date.getTime())) {
-                console.log('[MetaData] Apple QuickTime creationdate:', dateStr.trim());
-                return date;
-            }
+            const d = new Date(dateStr.trim());
+            if (!isNaN(d.getTime())) return SRC('QuickTime Creation', d);
         }
     } catch (e) {
-        console.warn('[MetaData] Error reading Apple QuickTime metadata:', e);
+        console.warn('[MetaData] Apple extractor error:', e);
     }
-    return null;
+    return SRC('QuickTime Creation', null);
 }
 
-export async function extractMetaDataVideo(file) {
-    console.log('[MetaData] Starting extraction for', file.name);
+function getMvhd(mp4boxFileInfo) {
+    const iso = mp4boxFileInfo?.created;
+    if (!iso) return SRC('Encoded Time (mvhd)', null);
+    const d = new Date(iso);
+    return SRC('Encoded Time (mvhd)', d);
+}
+
+// QuickTime '©day' in moov/udta. mp4box.js stores unknown boxes in udta.boxes.
+function getUdtaDay(mp4boxfile) {
+    try {
+        const udta = mp4boxfile.moov?.udta;
+        const boxes = udta?.boxes ?? [];
+        for (const box of boxes) {
+            // '©day' = 0xA9 0x64 0x61 0x79 — mp4box may expose as '\u00A9day' or 'day'
+            if (box.type !== '\u00A9day' && box.type !== '©day') continue;
+            const raw = box.data ?? box.string ?? null;
+            let str = null;
+            if (typeof raw === 'string') str = raw;
+            else if (raw && raw.byteLength) {
+                // Skip 2-byte length + 2-byte lang prefix per QuickTime spec
+                const u8 = raw instanceof Uint8Array ? raw : new Uint8Array(raw);
+                const payload = u8.byteLength > 4 ? u8.slice(4) : u8;
+                str = new TextDecoder('utf-8').decode(payload);
+            }
+            if (!str) continue;
+            const d = new Date(str.trim());
+            if (!isNaN(d.getTime())) return SRC('Tagged Time', d);
+        }
+    } catch (e) {
+        console.warn('[MetaData] udta/©day extractor error:', e);
+    }
+    return SRC('Tagged Time', null);
+}
+
+// Adobe XMP UUID: BE7ACFCB-97A9-42E8-9C71-999491E3AFAC
+const XMP_UUID = 'be7acfcb97a942e89c71999491e3afac';
+
+function getXmp(mp4boxfile) {
+    try {
+        const topBoxes = mp4boxfile.boxes ?? [];
+        for (const box of topBoxes) {
+            if (box.type !== 'uuid') continue;
+            const uuidHex = (box.uuid ?? '').toString().replace(/-/g, '').toLowerCase();
+            if (uuidHex !== XMP_UUID) continue;
+            const data = box.data;
+            if (!data) continue;
+            const u8 = data instanceof Uint8Array ? data : new Uint8Array(data);
+            const text = new TextDecoder('utf-8').decode(u8);
+            const m = /xmp:CreateDate="([^"]+)"/.exec(text)
+                ?? /<xmp:CreateDate>([^<]+)<\/xmp:CreateDate>/.exec(text);
+            if (!m) continue;
+            const d = new Date(m[1].trim());
+            if (!isNaN(d.getTime())) return SRC('Tagged Time (XMP)', d);
+        }
+    } catch (e) {
+        console.warn('[MetaData] XMP extractor error:', e);
+    }
+    return SRC('Tagged Time (XMP)', null);
+}
+
+// Merge udta/©day and XMP into one "Tagged Time" slot (udta wins if present)
+function getTag(mp4boxfile) {
+    const day = getUdtaDay(mp4boxfile);
+    if (day.available) return day;
+    return getXmp(mp4boxfile);
+}
+
+function getMtime(file, stat) {
+    const ms = stat?.mtimeMs ?? file?.lastModified;
+    if (ms == null) return SRC('File Modification', null);
+    return SRC('File Modification', new Date(ms));
+}
+
+function getBirthtime(stat) {
+    if (stat?.birthtimeMs == null) return SRC('File Creation', null);
+    return SRC('File Creation', new Date(stat.birthtimeMs));
+}
+
+// ---------- mp4box parse helper ----------
+// Feeds the file to mp4box in 2 MB chunks via Electron IPC until onReady fires.
+
+async function parseWithMp4box(file) {
     const mp4boxfile = MP4Box.createFile();
     let readyFired = false;
     let errFired = false;
+    let info = null;
 
-    // metadataPromise resolves when mp4box onReady or onError fires
-    const metadataPromise = new Promise((resolve) => {
+    const donePromise = new Promise((resolve) => {
         mp4boxfile.onError = (e) => {
             console.error('[MetaData] MP4Box Error:', e);
             errFired = true;
-            resolve({
-                creation: new Date(file.lastModified),
-                duration: 0
-            });
+            resolve();
         };
-
-        mp4boxfile.onReady = (info) => {
+        mp4boxfile.onReady = (i) => {
             readyFired = true;
-            const durationSec = info.duration / info.timescale;
-
-            // Primary: Apple QuickTime creationdate (actual recording start)
-            const appleDate = extractAppleCreationDate(mp4boxfile);
-            if (appleDate) {
-                console.log('[MetaData] Using Apple QuickTime creationdate for', file.name);
-                resolve({ creation: appleDate, duration: durationSec });
-                return;
-            }
-
-            // Fallback 1: mvhd creation time (subtract duration to estimate recording start)
-            if (info.created) {
-                const mvhdDate = new Date(info.created);
-                const startDate = new Date(mvhdDate.getTime() - durationSec * 1000);
-                console.log('[MetaData] Using mvhd creation time for', file.name,
-                    '| mvhd:', mvhdDate.toISOString(),
-                    '| estimated start:', startDate.toISOString());
-                resolve({ creation: startDate, duration: durationSec });
-                return;
-            }
-
-            // Fallback 2: file modification time
-            console.log('[MetaData] Using file.lastModified for', file.name);
-            resolve({
-                creation: new Date(file.lastModified),
-                duration: durationSec
-            });
+            info = i;
+            resolve();
         };
     });
 
-    // Feed file to mp4box in 2 MB chunks via Electron IPC.
-    // appendBuffer fires onReady synchronously once the moov atom is parsed,
-    // so we stop reading as soon as metadata is found — no need to load the full file.
     try {
-        const CHUNK = 2 * 1024 * 1024; // 2 MB
+        const CHUNK = 2 * 1024 * 1024;
         let offset = 0;
         let fileSize = null;
 
@@ -105,7 +149,6 @@ export async function extractMetaDataVideo(file) {
                 result.buffer.byteOffset + result.buffer.byteLength
             );
             ab.fileStart = offset;
-            // appendBuffer may synchronously trigger onReady, setting readyFired = true
             const nextOffset = mp4boxfile.appendBuffer(ab);
 
             offset = (nextOffset != null && nextOffset > offset) ? nextOffset : (offset + result.buffer.byteLength);
@@ -116,13 +159,117 @@ export async function extractMetaDataVideo(file) {
         }
     } catch (err) {
         console.error('[MetaData] Failed to read file:', err);
-        return { creation: new Date(file.lastModified), duration: 0 };
     }
 
-    if (!readyFired && !errFired) {
-        console.warn('[MetaData] mp4box did not fire onReady for', file.name, '- using fallback');
-        return { creation: new Date(file.lastModified), duration: 0 };
+    await donePromise;
+    return { mp4boxfile, info, readyFired, errFired };
+}
+
+// ---------- public API ----------
+
+// Runs every extractor in a single parse pass. Returns:
+// {
+//   sources: { apple, mvhd, tag, mtime, birthtime, gpmfGpsu, djiSrt } — each { available, value, label }
+//   duration: number  (seconds; 0 if unknown)
+//   hints: { hasGpmd, hasDjiSrt, isQt }
+// }
+export async function extractAllTimestampSources(file) {
+    console.log('[MetaData] extracting all sources for', file.name);
+
+    const [{ mp4boxfile, info }, stat, gpmfGpsuDate, djiSrtDate] = await Promise.all([
+        parseWithMp4box(file),
+        file._filePath
+            ? window.electronAPI.readFileStat(file._filePath).catch(() => null)
+            : Promise.resolve(null),
+        getGpmfFirstGpsu(file),
+        getDjiSrtTimestamp(file)
+    ]);
+
+    const duration = info && info.timescale ? info.duration / info.timescale : 0;
+
+    const apple = getApple(mp4boxfile);
+    const mvhd = getMvhd(info);
+    const tag = getTag(mp4boxfile);
+    const mtime = getMtime(file, stat);
+    const birthtime = getBirthtime(stat);
+    const gpmfGpsu = SRC('GPS Telemetry (GoPro)', gpmfGpsuDate);
+    const djiSrt = SRC('GPS Telemetry (DJI)', djiSrtDate);
+
+    const ftypBrands = info?.brands ?? [];
+    const isQt = apple.available || ftypBrands.includes('qt  ');
+    const hasGpmd = (info?.tracks ?? []).some(t =>
+        t.codec === 'gpmd' || /gopro/i.test(t.name ?? '') || /gpmf/i.test(t.name ?? '')
+    ) || gpmfGpsu.available;
+
+    return {
+        sources: { apple, mvhd, tag, mtime, birthtime, gpmfGpsu, djiSrt },
+        duration,
+        hints: { hasGpmd, hasDjiSrt: djiSrt.available, isQt }
+    };
+}
+
+// Picks the best source key given what's available. Returns a sourceKey string
+// consumable by resolveTimestamp (e.g. "apple:start", "gpmfGpsu", "mvhd:start").
+export function pickAuto({ sources, hints = {} }) {
+    if (sources.apple.available) return 'apple:start';
+    if (sources.gpmfGpsu.available) return 'gpmfGpsu';
+    if (sources.djiSrt.available) return 'djiSrt';
+    if (hints.isQt && sources.mvhd.available) return 'mvhd:end'; // legacy Apple behaviour
+    if (sources.mvhd.available) return 'mvhd:start';
+    if (sources.tag.available) return 'tag:start';
+    if (sources.mtime.available) return 'mtime:start';
+    return 'mtime:start';
+}
+
+// Applies a source choice to produce a Date.
+// sourceKey forms:
+//   "auto"                → resolved via pickAuto using all.hints
+//   "gpmfGpsu" | "djiSrt" → no anchor
+//   "<name>:start"        → raw value
+//   "<name>:end"          → raw value minus durationSec
+//   "manual"              → uses manualValue
+export function resolveTimestamp(all, { sourceKey, manualValue }) {
+    const { sources, duration } = all;
+    let key = sourceKey;
+    if (key === 'auto') key = pickAuto(all);
+
+    if (key === 'manual') {
+        const d = manualValue instanceof Date ? manualValue : new Date(manualValue);
+        return isNaN(d.getTime()) ? null : d;
     }
 
-    return metadataPromise;
+    if (key === 'gpmfGpsu') return sources.gpmfGpsu.value ?? null;
+    if (key === 'djiSrt') return sources.djiSrt.value ?? null;
+
+    const [name, anchor] = key.split(':');
+    const src = sources[name];
+    if (!src?.available) return null;
+    return anchor === 'end' ? new Date(src.value.getTime() - duration * 1000) : src.value;
+}
+
+// Backwards-compatible entry point used by VideoSource.jsx today.
+// Returns { creation, duration, allSources, sourceKey } — the extra fields are
+// cached on the video so the UI can switch sources without re-parsing.
+export async function extractMetaDataVideo(file) {
+    try {
+        const all = await extractAllTimestampSources(file);
+        const sourceKey = pickAuto(all);
+        const creation = resolveTimestamp(all, { sourceKey }) ?? new Date(file.lastModified);
+        return {
+            creation,
+            duration: all.duration,
+            allSources: all.sources,
+            hints: all.hints,
+            sourceKey
+        };
+    } catch (e) {
+        console.error('[MetaData] extraction failed:', e);
+        return {
+            creation: new Date(file.lastModified),
+            duration: 0,
+            allSources: null,
+            hints: null,
+            sourceKey: 'mtime:start'
+        };
+    }
 }

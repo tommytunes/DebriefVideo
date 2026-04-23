@@ -14,9 +14,16 @@ export function projectSerializer(state) {
             timestamp: entry.timestamp?.toString() ?? entry.timestamp
         })) ?? null;
  
+    // Strip allSources/hints — they are heavy and will be re-extracted on load
+    const serializeVideo = ({ allSources: _all, hints: _h, ...rest }) => ({
+        ...rest,
+        file: serializeFile(rest.file),
+        manualValue: rest.manualValue ? rest.manualValue.toString() : null
+    });
+
     const newVideoGroups = state.videoGroups.map(videoGroup => ({
         ...videoGroup,
-        videos: videoGroup.videos.map(video => ({ ...video, file: serializeFile(video.file) }))
+        videos: videoGroup.videos.map(serializeVideo)
     }));
 
     const newAudioGroups = state.audioGroups.map(audioGroup => ({
