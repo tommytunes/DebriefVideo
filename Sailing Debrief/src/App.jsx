@@ -10,18 +10,21 @@ import ProjectSaveLoad from "./components/Files/ProjectSaveLoad";
 import TimelineSidebar from "./components/Timeline/TimelineSidebar";
 import { useAuth } from "./auth/AuthProvider";
 import { LoginScreen } from "./auth/LoginScreen";
+import OpenDashboard from "./components/Dashboard/OpenDashboard";
+import Dashboard from "./components/Dashboard/Dashboard";
+import { useVideo } from './contexts/VideoContext';
 
 function App() {
 
   const { user, loading } = useAuth();
-
-  //if (loading) return <div>Loading...</div>
-  //if (!user) return <LoginScreen />
+  const { state } = useVideo();
 
   return (
+    <>
     <div className="flex flex-col h-screen overflow-hidden">
     <NavBar />
     <ProjectSaveLoad />
+    <OpenDashboard />
     <Routes>
       <Route path="/" element={
       <>
@@ -46,6 +49,20 @@ function App() {
     } />
     </Routes>
     </div>
+
+    {loading && (
+    <div className="fixed inset-0 z-50 backdrop-blur-sm bg-black/50 flex items-center justify-center">
+      <div className="text-white text-lg">Loading...</div>
+    </div>
+    )}
+    {!loading && !user && (
+      <div className="fixed inset-0 z-50 backdrop-blur-sm bg-black/50 flex items-center justify-center">
+        <LoginScreen />
+      </div>
+    )}
+
+    {state.showDashboard && <Dashboard />}
+    </>
   )
 }
 

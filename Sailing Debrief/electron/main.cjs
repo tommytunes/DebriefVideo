@@ -52,7 +52,8 @@ function createAppMenu() {
     {
       label: app.name,
       submenu: [
-        {label: 'Open Dev Tools', click: () => win.webContents.openDevTools()}
+        {label: 'Open Dev Tools', click: () => win.webContents.openDevTools()},
+        {label: 'Profile', click: () => win.webContents.send('menu:OpenDashboard') },
       ]
     },
     {

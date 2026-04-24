@@ -11,5 +11,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
   loadProject: () => ipcRenderer.invoke('project:load'),
   onMenuSave: (cb) => ipcRenderer.on('menu:saveProject', cb),
   onMenuLoad: (cb) => ipcRenderer.on('menu:loadProject', cb),
-  fetchUrl: (url) => ipcRenderer.invoke('fetch', url)
+  fetchUrl: (url) => ipcRenderer.invoke('fetch', url),
+  openDashboard: (cb) => ipcRenderer.on('menu:OpenDashboard', cb)
 })

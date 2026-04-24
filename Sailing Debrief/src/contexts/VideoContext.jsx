@@ -15,7 +15,8 @@ const initialState = {
     groupIdVideo2: null,
     windowMsGraph: 30_000,
     graphSelection: {heel: true, speed: true, heading: false, pitch: false},
-    map: {tailLength: 120_000, windDirection: 0}
+    map: {tailLength: 120_000, windDirection: 0},
+    showDashboard: false
 };
 
 function videoReducer(state, action) {
@@ -266,6 +267,9 @@ function videoReducer(state, action) {
         
         case 'SET_WIND_DIRECTION':
             return {...state, map: {...state.map, windDirection: action.payload}};
+        
+        case 'TOGGLE_DASHBOARD':
+            return {...state, showDashboard: !state.showDashboard};
         
         default:
             return state;
