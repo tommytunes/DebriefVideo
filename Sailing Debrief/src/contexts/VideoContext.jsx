@@ -1,6 +1,7 @@
 import { Stethoscope } from "lucide-react";
 import { createContext, useContext, useReducer } from "react";
 import { resolveTimestamp } from "../utils/MetaData";
+import { resolveAudioTimestamp } from "../utils/MetaDataAudio";
 
 const initialState = {
     videoGroups: [],
@@ -192,7 +193,7 @@ function videoReducer(state, action) {
             const {audioGroupId, audioId, newAudioTimeStamp} = action.payload;
             const newAudioTimeStampGroups = state.audioGroups.map( group =>
                 group.id === audioGroupId
-                ? {...group, audios: group.audios.map( audio => 
+                ? {...group, audios: group.audios.map( audio =>
                     audio.id === audioId ?
                     {...audio, timestamp: newAudioTimeStamp} :
                     audio
@@ -200,6 +201,27 @@ function videoReducer(state, action) {
             );
 
             return {...state, audioGroups: newAudioTimeStampGroups};
+
+        case 'SET_TIMESTAMP_SOURCE_AUDIO': {
+            const { groupId: tsAudioGroupId, audioId: tsAudioId, sourceKey, manualValue } = action.payload;
+            const updatedAudioGroups = state.audioGroups.map(group => {
+                if (group.id !== tsAudioGroupId) return group;
+                const newAudios = group.audios.map(audio => {
+                    if (audio.id !== tsAudioId) return audio;
+                    if (!audio.allSources) return { ...audio, timestampSource: sourceKey };
+                    const all = { sources: audio.allSources, duration: audio.duration ?? 0 };
+                    const ts = resolveAudioTimestamp(all, { sourceKey, manualValue }) ?? audio.timestamp;
+                    return {
+                        ...audio,
+                        timestamp: ts,
+                        timestampSource: sourceKey,
+                        manualValue: manualValue ?? null
+                    };
+                }).sort((a, b) => a.timestamp - b.timestamp);
+                return { ...group, audios: newAudios };
+            });
+            return { ...state, audioGroups: updatedAudioGroups };
+        }
         
         case 'SET_TIME':
             return {...state, currentTime: action.payload};

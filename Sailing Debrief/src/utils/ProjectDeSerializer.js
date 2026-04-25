@@ -1,4 +1,5 @@
 import { extractAllTimestampSources, resolveTimestamp, pickAuto } from "./MetaData";
+import { extractAllAudioTimestampSources, resolveAudioTimestamp, pickAudioAuto } from "./MetaDataAudio";
 
 async function rehydrateVideo(v) {
     const file = v.file;
@@ -25,6 +26,33 @@ async function rehydrateVideo(v) {
     }
 }
 
+async function rehydrateAudio(a) {
+    const baseTimestamp = new Date(a.timestamp);
+    const baseOriginal = new Date(a.originalTimeStamp);
+    const file = a.file;
+    if (!file?._filePath) {
+        return { ...a, timestamp: baseTimestamp, originalTimeStamp: baseOriginal };
+    }
+    try {
+        const all = await extractAllAudioTimestampSources(file);
+        const sourceKey = a.timestampSource ?? pickAudioAuto(all);
+        const manualValue = a.manualValue ? new Date(a.manualValue) : null;
+        const ts = resolveAudioTimestamp(all, { sourceKey, manualValue }) ?? baseTimestamp;
+        return {
+            ...a,
+            timestamp: ts,
+            originalTimeStamp: baseOriginal,
+            duration: all.duration || a.duration || 0,
+            allSources: all.sources,
+            timestampSource: sourceKey,
+            manualValue
+        };
+    } catch (e) {
+        console.warn('[ProjectDeSerializer] audio re-extract failed for', file.name, e);
+        return { ...a, timestamp: baseTimestamp, originalTimeStamp: baseOriginal };
+    }
+}
+
 export async function projectDeSerializer(json) {
     const state = JSON.parse(json);
 
@@ -34,10 +62,11 @@ export async function projectDeSerializer(json) {
             .sort((a, b) => a.timestamp - b.timestamp)
     })));
 
-    const newAudioGroups = state.audioGroups.map( ag => ({
+    const newAudioGroups = await Promise.all(state.audioGroups.map(async ag => ({
         ...ag,
-        audios: ag.audios.map(a => ({ ...a, timestamp: new Date(a.timestamp), originalTimeStamp: new Date(a.originalTimeStamp)}))
-    }));
+        audios: (await Promise.all(ag.audios.map(rehydrateAudio)))
+            .sort((a, b) => a.timestamp - b.timestamp)
+    })));
 
     const newDataGroups = state.dataGroups.map(  dg => {
 

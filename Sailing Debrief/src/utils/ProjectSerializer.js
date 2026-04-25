@@ -26,9 +26,15 @@ export function projectSerializer(state) {
         videos: videoGroup.videos.map(serializeVideo)
     }));
 
+    const serializeAudio = ({ allSources: _all, ...rest }) => ({
+        ...rest,
+        file: serializeFile(rest.file),
+        manualValue: rest.manualValue ? rest.manualValue.toString() : null
+    });
+
     const newAudioGroups = state.audioGroups.map(audioGroup => ({
         ...audioGroup,
-        audios: audioGroup.audios.map(audio => ({ ...audio, file: serializeFile(audio.file) }))
+        audios: audioGroup.audios.map(serializeAudio)
     }));
 
     const newDataGroups = state.dataGroups.map(dataGroup => ({
