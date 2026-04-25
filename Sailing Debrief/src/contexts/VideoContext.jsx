@@ -16,7 +16,8 @@ const initialState = {
     windowMsGraph: 30_000,
     graphSelection: {heel: true, speed: true, heading: false, pitch: false},
     map: {tailLength: 120_000, windDirection: 0},
-    showDashboard: false
+    showDashboard: false,
+    trialExpired: false
 };
 
 function videoReducer(state, action) {
@@ -270,6 +271,9 @@ function videoReducer(state, action) {
         
         case 'TOGGLE_DASHBOARD':
             return {...state, showDashboard: !state.showDashboard};
+
+        case 'SET_TRIAL_EXPIRED':
+            return {...state, trialExpired: action.payload};
         
         default:
             return state;

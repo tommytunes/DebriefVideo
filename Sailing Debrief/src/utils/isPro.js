@@ -1,0 +1,11 @@
+export function isPro(profile) {                                                                                                                                                                                                                                                                              
+      if (profile?.subscription_tier === 'pro') {
+          // null expiry = never expires (manual grant)                                                                                                                                                                                                                                           
+          if (!profile.subscription_expires_at) return true;                                                                                                                                                                                                                                      
+          return new Date(profile.subscription_expires_at) > new Date();                                                                                                                                                                                                                          
+      }                                                                                                                                                                                                                                                                                           
+      if (profile?.subscription_tier === 'trial') {                                                                                                                                                                                                                                               
+          return new Date(profile.trial_ends_at) > new Date();
+      }
+      return false;                                                                                                                                                                                                                                                                               
+  }

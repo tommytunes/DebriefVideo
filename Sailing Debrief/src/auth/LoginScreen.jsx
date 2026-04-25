@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { supabase } from './supabaseClient';
+import { URL } from '../constants/URL';
 
 export function LoginScreen() {
     const [email, setEmail] = useState('');
@@ -15,7 +16,7 @@ export function LoginScreen() {
 
         if (forgot) {
             const { error } = await supabase.auth.resetPasswordForEmail(email, {
-                redirectTo: 'http://localhost:5174/reset-password',
+                redirectTo: `${URL}reset-password`,
             });
             if (error) return setError(error.message);
             setMessage(`If an account exists for ${email}, we sent a reset link. Check your inbox.`);
@@ -41,7 +42,7 @@ export function LoginScreen() {
                         <button className='btn' type="button" onClick={() => { setForgot(false); setError(null); setMessage(null); }}>Back to Log In</button>
                     ) : (
                         <>
-                            <a className='btn' href='http://localhost:5174/account' target="_blank" rel="noreferrer">Need an account? Sign Up</a>
+                            <a className='btn' onClick={() => window.electronAPI.openExternal(`${URL}account`)} target="_blank" rel="noreferrer">Need an account? Sign Up</a>
                             <button type="button" className="link link-hover text-sm" onClick={() => { setForgot(true); setError(null); setMessage(null); }}>
                                 Forgot password?
                             </button>

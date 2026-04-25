@@ -13,6 +13,8 @@ import { LoginScreen } from "./auth/LoginScreen";
 import OpenDashboard from "./components/Dashboard/OpenDashboard";
 import Dashboard from "./components/Dashboard/Dashboard";
 import { useVideo } from './contexts/VideoContext';
+import UpdateBanner from "./components/NavBar/updateBanner";
+import TrialExpired from "./auth/TrialExpired";
 
 function App() {
 
@@ -23,6 +25,7 @@ function App() {
     <>
     <div className="flex flex-col h-screen overflow-hidden">
     <NavBar />
+    <UpdateBanner />
     <ProjectSaveLoad />
     <OpenDashboard />
     <Routes>
@@ -62,6 +65,7 @@ function App() {
     )}
 
     {state.showDashboard && <Dashboard />}
+    {state.trialExpired && <TrialExpired />}
     </>
   )
 }

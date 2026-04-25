@@ -2,20 +2,22 @@ import { useVideo } from '../../contexts/VideoContext';
 import { useEffect } from 'react';
 import { useAuth } from '../../auth/AuthProvider';
 import { supabase } from '../../auth/supabaseClient';
+import { isPro } from '../../utils/isPro';
+import { URL } from '../../constants/URL';
 
 const Dashboard = () => {
     const { dispatch } = useVideo();
     const close = () => dispatch({ type: 'TOGGLE_DASHBOARD' });
-    const { user, loading } = useAuth();
+    const { user, profile } = useAuth();
     const name = user?.user_metadata?.name || user?.email?.split("@")[0] || "there";
     useEffect(() => {
          const onKey = e => e.key === 'Escape' && close();
          window.addEventListener('keydown', onKey);
          return () => window.removeEventListener('keydown', onKey);
      }, []);
-
-     
     
+
+    const remainingTrialDays = Math.ceil((new Date(profile?.trial_ends_at).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
     return (
         <div
              className="fixed inset-0 z-40 backdrop-blur-sm bg-black/50 flex items-center justify-center"
@@ -30,10 +32,11 @@ const Dashboard = () => {
                      <button className="btn btn-ghost btn-sm" onClick={close}>✕</button>
                  </div>
                  <div className='flex flex-row justify-between items-center'>
-                    <p className='text text-lg'>Welcome {name}</p>
+                    <p className='text text-lg'>Welcome {name} {profile?.subscription_tier === 'trial' && `, ${profile ? remainingTrialDays : 'X'} days left on your free trial`}</p>
                     <button className='btn btn-error' onClick={() => supabase.auth.signOut()}>Sign Out</button>
                  </div>
-                 <button className='btn btn-large'><a href='http://localhost:5174/account' target="_blank" rel="noopener noreferrer">Manage Account</a></button>
+                 <h1 className='text text-lg font-bold'>Subscription status: {profile?.subscription_tier ?? 'loading...'}</h1>
+                 <button className='btn btn-large' onClick={() => window.electronAPI.openExternal(`${URL}account`)}>Manage Account</button>
                  
              </div>
          </div>

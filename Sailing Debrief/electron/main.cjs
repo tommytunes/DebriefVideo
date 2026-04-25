@@ -1,4 +1,4 @@
-const { app, BrowserWindow, dialog, ipcMain, Menu } = require('electron')
+const { app, BrowserWindow, dialog, ipcMain, Menu, shell } = require('electron')
 const path = require('path')
 const fs = require('fs')
 
@@ -144,6 +144,8 @@ ipcMain.handle('fetch', async (_event, url) => {
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return await res.json();
 })
+
+ipcMain.handle('shell:openExternal', (_e, url) => shell.openExternal(url));
 
 
 app.whenReady().then(() => {
