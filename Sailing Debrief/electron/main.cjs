@@ -1,6 +1,8 @@
 const { app, BrowserWindow, dialog, ipcMain, Menu, shell } = require('electron')
 const path = require('path')
 const fs = require('fs')
+const { machineIdSync } = require('node-machine-id');
+const os = require('os');
 
 let win;
 
@@ -146,6 +148,12 @@ ipcMain.handle('fetch', async (_event, url) => {
 })
 
 ipcMain.handle('shell:openExternal', (_e, url) => shell.openExternal(url));
+
+ipcMain.handle('auth:getMachineInfo', () => ({
+  machineId: machineIdSync({original: false}),
+  platform: process.platform,
+  hostname: os.hostname(),
+}));
 
 
 app.whenReady().then(() => {

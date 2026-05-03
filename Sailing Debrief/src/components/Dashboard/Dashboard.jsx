@@ -2,14 +2,18 @@ import { useVideo } from '../../contexts/VideoContext';
 import { useEffect } from 'react';
 import { useAuth } from '../../auth/AuthProvider';
 import { supabase } from '../../auth/supabaseClient';
-import { isPro } from '../../utils/isPro';
+import { isPro, isPaid } from '../../utils/isPro';
 import { URL } from '../../constants/URL';
+import { isExpired } from '../../utils/isExpired';
 
 const Dashboard = () => {
     const { dispatch } = useVideo();
     const close = () => dispatch({ type: 'TOGGLE_DASHBOARD' });
-    const { user, profile } = useAuth();
+    const { user, profile, loading } = useAuth();
     const name = user?.user_metadata?.name || user?.email?.split("@")[0] || "there";
+    const isUserPro = isPro(profile);
+    const isUserExpired = isExpired(profile);
+    const hasPaid = isPaid(profile);
     useEffect(() => {
          const onKey = e => e.key === 'Escape' && close();
          window.addEventListener('keydown', onKey);
@@ -32,10 +36,10 @@ const Dashboard = () => {
                      <button className="btn btn-ghost btn-sm" onClick={close}>✕</button>
                  </div>
                  <div className='flex flex-row justify-between items-center'>
-                    <p className='text text-lg'>Welcome {name} {profile?.subscription_tier === 'trial' && `, ${profile ? remainingTrialDays : 'X'} days left on your free trial`}</p>
+                    <p className='text text-lg'>Welcome {name} {!hasPaid && !isUserExpired && `, ${profile ? remainingTrialDays : 'X'} days left on your free trial`}</p>
                     <button className='btn btn-error' onClick={() => supabase.auth.signOut()}>Sign Out</button>
                  </div>
-                 <h1 className='text text-lg font-bold'>Subscription status: {profile?.subscription_tier ?? 'loading...'}</h1>
+                 <h1 className='text text-lg font-bold'>Subscription status: {loading ? 'loading...' : hasPaid ? 'Pro' : isUserExpired ? 'Expired' : 'Trial'}</h1>
                  <button className='btn btn-large' onClick={() => window.electronAPI.openExternal(`${URL}account`)}>Manage Account</button>
                  
              </div>

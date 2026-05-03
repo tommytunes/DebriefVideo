@@ -7,6 +7,7 @@ export function AuthProvider({ children }) {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [profile, setProfile] = useState(null);
+    const [authError, setAuthError] = useState(null);
     const profileChannelRef = useRef(null);
 
     async function fetchProfile(userId) {
@@ -34,10 +35,10 @@ export function AuthProvider({ children }) {
     }
 
     useEffect(() => {
-        supabase.auth.getSession().then(({ data: { session } }) => {
+        supabase.auth.getSession().then( async ({ data: { session } }) => {
             setUser(session?.user ?? null);
             if (session?.user) {
-                fetchProfile(session.user.id);
+                await fetchProfile(session.user.id);
                 subscribeToProfile(session.user.id);
             }
             setLoading(false);
@@ -68,7 +69,7 @@ export function AuthProvider({ children }) {
     }, [])
 
     return (
-        <AuthContext.Provider value={{ user, loading, profile}}>
+        <AuthContext.Provider value={{ user, loading, profile, authError, setAuthError}}>
             {children}
         </AuthContext.Provider>
     );

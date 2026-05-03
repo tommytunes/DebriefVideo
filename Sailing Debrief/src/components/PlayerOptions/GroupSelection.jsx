@@ -2,17 +2,17 @@ import { useVideo } from "../../contexts/VideoContext";
 
 const GroupSelection = ({groups, type, label}) => {
 
-    const { dispatch } = useVideo();
+    const { state, dispatch } = useVideo();
 
     const handleOnChange1 = (e) => {dispatch({type: type[0], payload: e.target.value})};
     const handleOnChange2 = (e) => {dispatch({type: type[1], payload: e.target.value})};
 
     return(
-        <div className="flex flex-col">
+        <div className="flex flex-col z-20">
         <div className="p-2">
             <label>
                 Choose Source 1: 
-                <select onChange={handleOnChange1}>
+                <select value={state.groupIdVideo1} onChange={handleOnChange1}>
                     <option value="">-- Select --</option>
                     {groups.length === 0 ? 
                     <option>No {label} Group Created</option> :
@@ -28,7 +28,7 @@ const GroupSelection = ({groups, type, label}) => {
             <div className="p-2">
                 <label>
                 Choose Source 2: 
-                    <select onChange={handleOnChange2}>
+                    <select value={state.groupIdVideo2} onChange={handleOnChange2}>
                         <option value="">-- Select --</option>
                         {groups.length === 0 ? 
                         <option>No {label} Group Created</option> :

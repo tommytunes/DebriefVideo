@@ -130,6 +130,9 @@ const VideoSource = () => {
               }
           }));
           dispatch({ type: 'ADD_VIDEO', payload: { videos, groupId } });
+          if (state.videoGroups.length <= 1 ) dispatch({type: 'SET_VIDEO1', payload: groupId});
+          else if (state.videoGroups.length <= 2) dispatch({type: 'SET_VIDEO2', payload: groupId});
+          
       };
 
 

@@ -14,4 +14,5 @@ contextBridge.exposeInMainWorld('electronAPI', {
   fetchUrl: (url) => ipcRenderer.invoke('fetch', url),
   openDashboard: (cb) => ipcRenderer.on('menu:OpenDashboard', cb),
   openExternal: (url) => ipcRenderer.invoke('shell:openExternal', url),
+  getMachineInfo: () => ipcRenderer.invoke('auth:getMachineInfo'),
 })

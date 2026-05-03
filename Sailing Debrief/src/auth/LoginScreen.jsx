@@ -1,11 +1,14 @@
 import { useState } from 'react';
 import { supabase } from './supabaseClient';
 import { URL } from '../constants/URL';
+import { claimDevice } from './claimDevice';
+import { useAuth } from './AuthProvider';
 
 export function LoginScreen() {
+    const { authError: error, setAuthError: setError } = useAuth();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [error, setError] = useState(null);
+    //const [error, setError] = useState(null);
     const [message, setMessage] = useState(null);
     const [forgot, setForgot] = useState(false);
 
@@ -24,7 +27,28 @@ export function LoginScreen() {
         }
 
         const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) setError(error.message);
+        if (error) return setError(error.message);
+
+        let claim;
+        try {
+        claim = await claimDevice();
+        } catch (e) {
+        console.error('[login] claimDevice threw', e);
+        return setError('Could not verify this device. Please try again.');
+        }
+        if (!claim.ok) {
+            if (claim.reason === 'device_mismatch') {
+                setError(
+                `This account is already locked to another device` +
+                (claim.registered_device_name ? ` (${claim.registered_device_name}).` : '.') +
+                ` Release it from your dashboard at sailing-debrief.com/account to log in here.`
+                );
+            }
+            else {
+            setError('Could not verify this device. Please try again.');
+        }
+        } 
+        return;
     }
 
     return (
