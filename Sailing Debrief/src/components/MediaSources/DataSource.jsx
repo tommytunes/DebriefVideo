@@ -61,11 +61,13 @@ const DataSource = () => {
         const data = await Promise.all(files.map(async file => {
             let telemetry = [];
             try {
+                const fileExists = await window.electronAPI.fileExists(file?._filePath);
+                if (!fileExists) dispatch({type: 'SET_DATA_MISSING', payload: {dataGroupId: groupId, missingData: true}});
                 telemetry = await extractMetaDataGPS(file);
             } catch (err) {
                 console.error('[DataSource] GPS parse error for', file.name, err);
             }
-            return { id: crypto.randomUUID(), file, url: 'file://' + file._filePath, source: 'filesystem', telemetry };
+            return { id: crypto.randomUUID(), file, url: 'file://' + file._filePath, source: 'filesystem', telemetry, missing: false };
         }));
         dispatch({ type: 'ADD_DATA', payload: { data, groupId } });
     };
@@ -118,8 +120,9 @@ const DataSource = () => {
                                         <div>
                                             {group.data?.source === 'filesystem' ?
                                             <li key={group.data.id} className="list-col-grow">{group.data.file.name}</li> :
-                                            <li key={group.data.id} className="list-col-grow">Data from Racesense tracking</li> 
+                                            <li key={group.data.id} className="list-col-grow">Data from Racesense tracking</li>
                                             }
+                                            {group.data.missing && <p className="text-xs text-orange-500">File missing</p>}
                                         </div>
                                         <button onClick={() => handleDeleteData(group.id)} className=" btn btn-sm">Delete</button>
                                     </div>

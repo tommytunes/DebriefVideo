@@ -127,7 +127,8 @@ const AudioSource = () => {
                       originalTimeStamp: creation,
                       allSources,
                       timestampSource: sourceKey,
-                      manualValue: null
+                      manualValue: null,
+                      missing: false
                   };
               } catch (error) {
                   console.error('[AudioSource] Failed to extract audio metadata:', error);
@@ -236,6 +237,7 @@ const AudioSource = () => {
                                         <div key={audio.id} className="list-row">
                                             <div className="flex-1">
                                                 <li className="list-col-grow">{audio.file.name}</li>
+                                                {audio.missing && <p className="text-xs text-orange-500">File missing</p>}
                                                 <p className="text-xs">
                                                     {audio.timestamp && isFinite(audio.timestamp.getTime())
                                                     ? audio.timestamp.toLocaleString()

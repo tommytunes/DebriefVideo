@@ -15,10 +15,11 @@ export function projectSerializer(state) {
         })) ?? null;
  
     // Strip allSources/hints — they are heavy and will be re-extracted on load
-    const serializeVideo = ({ allSources: _all, hints: _h, ...rest }) => ({
+    const serializeVideo = ({ allSources: _all, hints: _h, missing: _m, ...rest }) => ({
         ...rest,
         file: serializeFile(rest.file),
-        manualValue: rest.manualValue ? rest.manualValue.toString() : null
+        manualValue: rest.manualValue ? rest.manualValue.toString() : null,
+       // missing: false
     });
 
     const newVideoGroups = state.videoGroups.map(videoGroup => ({
@@ -26,7 +27,7 @@ export function projectSerializer(state) {
         videos: videoGroup.videos.map(serializeVideo)
     }));
 
-    const serializeAudio = ({ allSources: _all, ...rest }) => ({
+    const serializeAudio = ({ allSources: _all, missing: _m, ...rest }) => ({
         ...rest,
         file: serializeFile(rest.file),
         manualValue: rest.manualValue ? rest.manualValue.toString() : null

@@ -151,6 +151,7 @@ const VideoPlayback = () => {
             className="w-full h-full object-contain"
             preload='auto'
             muted={group1.muted}
+            onError={ () => dispatch({type: 'SET_VIDEO_MISSING', payload : { vidGroupId: state.groupIdVideo1, vidId: video1.id, missingVid: true }})}
             />
             <VideoOverlay absoluteTime={absoluteTime}/>
             <div className='absolute top-2 right-2'>
@@ -199,6 +200,7 @@ const VideoPlayback = () => {
             className="w-full h-full object-contain"
             preload='auto'
             muted={group2.muted}
+            onError={ () => dispatch({type: 'SET_VIDEO_MISSING', payload : { vidGroupId: state.groupIdVideo2, vidId: video2.id, missingVid: true }})}
             />
             <VideoOverlay absoluteTime={absoluteTime}/>
             <div className='absolute top-2 right-2'>

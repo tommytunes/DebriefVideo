@@ -14,6 +14,7 @@ import OpenDashboard from "./components/Dashboard/OpenDashboard";
 import Dashboard from "./components/Dashboard/Dashboard";
 import { useVideo } from './contexts/VideoContext';
 import UpdateBanner from "./components/NavBar/updateBanner";
+import MissingBanner from "./components/NavBar/MissingBanner";
 import TrialExpired from "./auth/TrialExpired";
 
 function App() {
@@ -26,6 +27,7 @@ function App() {
     <div className="flex flex-col h-screen overflow-hidden">
     <NavBar />
     <UpdateBanner />
+    <MissingBanner />
     <ProjectSaveLoad />
     <OpenDashboard />
     <Routes>

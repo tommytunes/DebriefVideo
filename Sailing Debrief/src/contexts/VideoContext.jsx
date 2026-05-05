@@ -296,7 +296,41 @@ function videoReducer(state, action) {
 
         case 'SET_TRIAL_EXPIRED':
             return {...state, trialExpired: action.payload};
-        
+
+        case 'SET_VIDEO_MISSING': {
+            const { vidGroupId, vidId, missingVid } = action.payload;
+            const newMissingVideoGroups = state.videoGroups.map(group => {
+                if (group.id !== vidGroupId ) return group;
+                const newVidMissing = group.videos.map( video => {
+                    if (video.id !== vidId) return video;
+                    return {...video, missing: missingVid }
+                })
+
+                return {...group, videos: newVidMissing}
+            })
+            return {...state, videoGroups: newMissingVideoGroups}
+        }
+        case 'SET_AUDIO_MISSING': {
+            const {audGroupId, audId, missingAud } = action.payload;
+            const newMissingAudioGroups = state.audioGroups.map(group => {
+                if (group.id !== audGroupId) return group;
+                const newAudMissing = group.audios.map(audio => {
+                    if (audio.id !== audId) return audio;
+                    return {...audio, missing: missingAud };
+                })
+                return {...group, audios: newAudMissing}
+            })
+            return {...state, audioGroups: newMissingAudioGroups}
+        }
+        case 'SET_DATA_MISSING': {
+            const {dataGroupId, missingData} = action.payload;
+            const newMissingDataGroups = state.dataGroups.map(group => {
+                if (group.id !== dataGroupId) return group;
+
+                return {...group, data: {...group.data, missing: missingData}}
+            })
+            return {...state, dataGroups: newMissingDataGroups}
+        }
         default:
             return state;
     }

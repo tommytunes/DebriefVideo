@@ -112,7 +112,8 @@ const VideoSource = () => {
                       allSources,
                       hints,
                       timestampSource: sourceKey,
-                      manualValue: null
+                      manualValue: null,
+                      missing: false
                   };
               } catch (error) {
                   console.error('[VideoSource] Failed to extract video metadata:', error);
@@ -125,7 +126,8 @@ const VideoSource = () => {
                       allSources: null,
                       hints: null,
                       timestampSource: 'mtime:start',
-                      manualValue: null
+                      manualValue: null,
+                      missing: false
                   };
               }
           }));
@@ -166,6 +168,7 @@ const VideoSource = () => {
                                         <div key={video.id} className="list-row">
                                             <div className="flex-1">
                                                 <li className="list-col-grow">{video.file.name}</li>
+                                                {video.missing && <p className="text-xs text-orange-500">File missing</p>}
                                                 <p className="text-xs">{video.timestamp.toLocaleString()}</p>
                                                 <div className="flex flex-col gap-1 mt-1">
                                                     <label className="text-xs">Timestamp source</label>

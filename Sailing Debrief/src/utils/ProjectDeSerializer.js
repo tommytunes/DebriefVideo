@@ -4,13 +4,16 @@ import { extractAllAudioTimestampSources, resolveAudioTimestamp, pickAudioAuto }
 async function rehydrateVideo(v) {
     const file = v.file;
     if (!file?._filePath) {
-        return { ...v, timestamp: new Date(v.timestamp) };
+        return { ...v, timestamp: new Date(v.timestamp), missing: true };
     }
+    const fileExists = await window.electronAPI.fileExists(file?._filePath);
+    if (!fileExists) return {...v, timestamp: new Date(v.timestamp), missing: true};
     try {
         const all = await extractAllTimestampSources(file);
         const sourceKey = v.timestampSource ?? pickAuto(all);
         const manualValue = v.manualValue ? new Date(v.manualValue) : null;
         const ts = resolveTimestamp(all, { sourceKey, manualValue }) ?? new Date(v.timestamp);
+        
         return {
             ...v,
             timestamp: ts,
@@ -18,11 +21,12 @@ async function rehydrateVideo(v) {
             allSources: all.sources,
             hints: all.hints,
             timestampSource: sourceKey,
-            manualValue
+            manualValue,
+            missing: false,
         };
     } catch (e) {
         console.warn('[ProjectDeSerializer] re-extract failed for', file.name, e);
-        return { ...v, timestamp: new Date(v.timestamp) };
+        return { ...v, timestamp: new Date(v.timestamp), missing: false };
     }
 }
 
@@ -31,13 +35,16 @@ async function rehydrateAudio(a) {
     const baseOriginal = new Date(a.originalTimeStamp);
     const file = a.file;
     if (!file?._filePath) {
-        return { ...a, timestamp: baseTimestamp, originalTimeStamp: baseOriginal };
+        return { ...a, timestamp: baseTimestamp, originalTimeStamp: baseOriginal, missing: true };
     }
+    const fileExists = await window.electronAPI.fileExists(file?._filePath);
+    if (!fileExists) return { ...a, timestamp: baseTimestamp, originalTimeStamp: baseOriginal, missing: true };
     try {
         const all = await extractAllAudioTimestampSources(file);
         const sourceKey = a.timestampSource ?? pickAudioAuto(all);
         const manualValue = a.manualValue ? new Date(a.manualValue) : null;
         const ts = resolveAudioTimestamp(all, { sourceKey, manualValue }) ?? baseTimestamp;
+        
         return {
             ...a,
             timestamp: ts,
@@ -45,11 +52,12 @@ async function rehydrateAudio(a) {
             duration: all.duration || a.duration || 0,
             allSources: all.sources,
             timestampSource: sourceKey,
-            manualValue
+            manualValue,
+            missing: false
         };
     } catch (e) {
         console.warn('[ProjectDeSerializer] audio re-extract failed for', file.name, e);
-        return { ...a, timestamp: baseTimestamp, originalTimeStamp: baseOriginal };
+        return { ...a, timestamp: baseTimestamp, originalTimeStamp: baseOriginal, missing: true };
     }
 }
 

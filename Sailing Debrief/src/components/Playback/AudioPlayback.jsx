@@ -86,6 +86,7 @@ const AudioPlayback = () => {
                 if (element) audioRefs.current[group.id] = element;
                 else delete audioRefs.current[group.id];
             }}
+            onError={() => dispatch({type: 'SET_AUDIO_MISSING', payload : {audGroupId: group.id , audId: audio.id, missingAud: true }}) }
             />}
             </div>
         );
