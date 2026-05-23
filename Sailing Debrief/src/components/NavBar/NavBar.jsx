@@ -7,10 +7,10 @@ export function NavBar() {
     const { state } = useVideo();
     const timelineStart = FindTimelineStart(state.videoGroups, state.audioGroups, state.dataGroups);
     return(
-        <div className="navbar bg-base-100 shadow-sm">
+        <div className="navbar min-h-0 py-1 bg-base-100 shadow-sm">
             <div className="navbar-start">
-                <NavLink to="/" className="btn btn-ghost text-xl" end>Video Player</NavLink>
-                <NavLink to="/files" className="btn btn-ghost text-xl" end>Files</NavLink>
+                <NavLink to="/" className="btn btn-ghost btn-sm text-base" end>Video Player</NavLink>
+                <NavLink to="/files" className="btn btn-ghost btn-sm text-base" end>Files</NavLink>
             </div>
             <div className="navbar-end pr-4">
                 <div className="pr-4">

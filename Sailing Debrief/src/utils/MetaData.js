@@ -4,6 +4,8 @@ import { getGpmfFirstGpsu, getDjiSrtTimestamp } from './TelemetryTimestamp'
 // ---------- per-source extractors ----------
 // Each returns { available: boolean, value: Date | null, label: string }
 
+const MIN_SANE_DATE = new Date('2000-01-01T00:00:00Z');
+
 const SRC = (label, value) => ({
     label,
     value: value instanceof Date && !isNaN(value.getTime()) ? value : null,
@@ -34,6 +36,7 @@ function getMvhd(mp4boxFileInfo) {
     const iso = mp4boxFileInfo?.created;
     if (!iso) return SRC('Encoded Time (mvhd)', null);
     const d = new Date(iso);
+    if (d < MIN_SANE_DATE) return SRC('Encoded Time (mvhd)', null);
     return SRC('Encoded Time (mvhd)', d);
 }
 

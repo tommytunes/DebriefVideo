@@ -257,7 +257,8 @@ function videoReducer(state, action) {
                 const firstOriginal = group.audios[0].originalTimeStamp.getTime();
                 return {...group, audios: group.audios.map( audio => {
                     const offset = audio.originalTimeStamp.getTime() - firstOriginal;
-                    return {...audio, timestamp: new Date( accurateTimeStamp + offset) }
+                    const newTs = new Date( accurateTimeStamp + offset);
+                    return {...audio, timestamp: newTs, timestampSource: 'manual', manualValue: newTs}
                 })};
             }
             );

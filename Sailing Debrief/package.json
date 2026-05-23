@@ -1,12 +1,42 @@
 {
   "name": "sailing-debrief",
   "private": true,
-  "version": "1.1.1",
+  "version": "1.2.2",
   "type": "module",
   "main": "electron/main.cjs",
   "overrides": {
     "react-dropzone": {
       "react": "$react"
+    }
+  },
+
+  "build": {
+    "appId": "com.thomasstaples.sailingdebrief",
+    "productName": "Sailing Debrief",
+    "icon": "build/DebriefIcon.png",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*"
+    ],
+    "mac": {
+      "category": "public.app-category.sports",
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist",
+      "notarize": true
+    },
+    "win": {
+      "target": [{ "target": "nsis", "arch": ["x64"] }]
+    },
+    "nsis": {
+      "include": "build/installer.nsh"
+    },
+    "dmg": {
+      "sign": true
     }
   },
   "scripts": {
@@ -18,7 +48,8 @@
     "electron:build": "vite build && electron-builder",
     "electron:build:win": "vite build && electron-builder --win",
     "electron:build:mac": "vite build && electron-builder --mac",
-    "electron:build:all": "vite build && electron-builder --mac --win"
+    "electron:build:mac:intel": "vite build && electron-builder --mac --x64",
+    "electron:build:all": "vite build && electron-builder --mac --win --mac --x64"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.100.1",

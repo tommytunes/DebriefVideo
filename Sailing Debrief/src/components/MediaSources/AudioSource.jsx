@@ -15,6 +15,13 @@ function fmt(date) {
     return date.toLocaleString(undefined, { hour12: false });
 }
 
+function toLocalInputValue(d) {
+     if (!(d instanceof Date) || isNaN(d.getTime())) return '';
+     const pad = n => String(n).padStart(2, '0');
+     return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}` +
+            `T${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+ }
+
 function buildAudioSourceOptions(audio) {
     const all = audio.allSources;
     if (!all) {
@@ -76,6 +83,8 @@ const AudioSource = () => {
     };
 
     const handleAudioManualChange = (groupId, audio, value) => {
+        const d = new Date(value);
+        if (isNaN(d.getTime())) return;
         dispatch({
             type: 'SET_TIMESTAMP_SOURCE_AUDIO',
             payload: {
@@ -259,6 +268,7 @@ const AudioSource = () => {
                                                             className="input input-xs"
                                                             type="datetime-local"
                                                             step="1"
+                                                            value={toLocalInputValue(audio.timestamp)}
                                                             onChange={(e) => handleAudioManualChange(group.id, audio, e.target.value)}
                                                         />
                                                     )}
