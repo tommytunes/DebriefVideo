@@ -14,14 +14,6 @@ const TrialExpired = () => {
     const hasPaid = isPaid(profile);
     const isUserExpired = isExpired(profile)
 
-    useEffect(() => {
-        if (!profile) return;
-        if (isUserPro) return;
-        if (!hasPaid || isUserExpired) {
-            dispatch({type: 'SET_TRIAL_EXPIRED', payload: true});
-        }
-    }, [profile])
-
     return (
         <div
              className="fixed inset-0 z-60 backdrop-blur-sm bg-black/50 flex items-center justify-center"
@@ -35,7 +27,7 @@ const TrialExpired = () => {
                  <div className='flex flex-row justify-between items-center'>
                     <p className='text text-lg'>Click on button below to renew your subscription</p>
                  </div>
-                 <button className='btn btn-large' onClick={() => window.electronAPI.openExternal(`${URL}pricing`)}>Manage Account</button>
+                 <button className='btn btn-large' onClick={() => window.electronAPI.openExternal(`${URL}account`)}>Manage Account</button>
                  
              </div>
          </div>

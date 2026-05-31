@@ -16,6 +16,7 @@ import { useVideo } from './contexts/VideoContext';
 import UpdateBanner from "./components/NavBar/updateBanner";
 import MissingBanner from "./components/NavBar/MissingBanner";
 import TrialExpired from "./auth/TrialExpired";
+import ExpiredCheck from "./auth/ExpiredCheck";
 
 function App() {
 
@@ -30,6 +31,7 @@ function App() {
     <MissingBanner />
     <ProjectSaveLoad />
     <OpenDashboard />
+    <ExpiredCheck />
     <Routes>
       <Route path="/" element={
       <>

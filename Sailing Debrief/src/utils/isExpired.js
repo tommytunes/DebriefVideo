@@ -3,7 +3,7 @@ export function isExpired(profile) {
     if (profile?.subscription_status === 'active') return false;
 
     const trialEndDate = new Date(profile?.trial_ends_at);
-    if (profile?.trial_ends_at && Date.now() > trialEndDate.getTime()) return true;
+    if (profile?.trial_ends_at && Date.now() > trialEndDate.getTime() || profile?.trial_ends_at === null) return true;
 
     return false;
 }

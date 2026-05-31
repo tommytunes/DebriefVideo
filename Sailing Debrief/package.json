@@ -49,7 +49,7 @@
     "electron:build:win": "vite build && electron-builder --win",
     "electron:build:mac": "vite build && electron-builder --mac",
     "electron:build:mac:intel": "vite build && electron-builder --mac --x64",
-    "electron:build:all": "vite build && electron-builder --mac --win --mac --x64"
+    "electron:build:all": "vite build && electron-builder --mac --win && electron-buildern --mac --x64"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.100.1",
