@@ -1,6 +1,10 @@
 import { ROW_SIZES, MS_TO_KNOTS } from "../constants/GpsConstants";
+import FitParser from 'fit-file-parser'
+import { calculateBearing } from "./FindTelemetryData";
 
 export async function extractMetaDataGPS(file) {
+    const ext = file.name.split('.').pop().toLowerCase();
+   if (ext === 'fit') return await parseGarminFIT(file);
     return await parseGPSData(file);
 };
 
@@ -86,11 +90,60 @@ if (!file._filePath) {
                 pitch: pitch,
                 heading: heading,
                 latitude: latitude / 10**7,
-                longitude: longitude / 10**7
+                longitude: longitude / 10**7,
+                heartRate: null,
             })
         } else {
             offset += size;
         }
     }
     return data;
+}
+
+async function parseGarminFIT(file) {
+    const content = await file.arrayBuffer();
+    const data = [];
+    let records;
+
+    const fitParser = new FitParser({
+        force: true, 
+        speedUnit: 'km/h', 
+        lengthUnit: 'km', 
+        elapsedRecordField: true, 
+        mode: 'list'
+    });
+
+    fitParser.parse(content, (error, data) => {
+        if (error) console.error(error);
+
+        else { records = data.records };
+    })
+
+    for (const record of records) {
+        if (record.position_lat == null || record.position_long == null) continue;
+        data.push({
+            timestamp: BigInt(Math.round(record.timestamp.getTime())), // microseconds, matches VKX
+            speed: (record.enhanced_speed ?? record.speed ?? 0) * 0.539957, // m/s → knots
+            heel: null,
+            pitch: null,
+            heading: record.position_crs ?? null, // COG in degrees
+            latitude: record.position_lat,     // already converted from semicircles
+            longitude: record.position_long,
+            heartRate: record.heart_rate ?? null,
+        });
+    }
+
+    for (let i = 0; i < data.length; i++) {
+      if (i < data.length - 1) {
+          data[i].heading = calculateBearing(
+              data[i].latitude, data[i].longitude,
+              data[i + 1].latitude, data[i + 1].longitude
+          );
+      } else {
+          data[i].heading = data[i - 1]?.heading ?? null;
+      }
+  }
+
+    return data;
+
 }

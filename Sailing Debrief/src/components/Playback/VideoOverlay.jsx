@@ -12,7 +12,7 @@ const VideoOverlay = ({absoluteTime}) => {
         { state.dataGroups.length > 0 &&
             <div className='absolute top-2 left-2 bottom-2 flex flex-col flex-wrap gap-2'>
             {state.dataGroups.map((group) => {
-                const [telemetry, setTelemetry] = useState({speed: true, heel: true, heading: true, pitch: true})
+                const [telemetry, setTelemetry] = useState({speed: true, heel: true, heading: true, pitch: true, heartRate: true})
                 if (!group.show) return;
                 if (group.type === 'mark') return;
                 const data = findTelemetryData(group.data.telemetry, absoluteTime);
@@ -24,10 +24,11 @@ const VideoOverlay = ({absoluteTime}) => {
                                 <p>{group.name}</p>
                                 <TelemetrySelection state={telemetry} setState={setTelemetry}/>
                             </div>
-                        {telemetry.speed && <p>Speed: {data.speed !== null ? data.speed.toFixed(1): "--"} </p>}
-                        {telemetry.heel && <p>Heel: {data.heel !== null ? data.heel.toFixed(1): "--"}</p>}
-                        {telemetry.heading && <p>Heading: {data.heading !== null ? data.heading.toFixed(0): "--"}</p>}
-                        {telemetry.pitch && <p>Pitch: {data.pitch !== null ? data.pitch.toFixed(1): "--"}</p>}
+                        {telemetry.speed && <p>Speed: {data.speed != null ? data.speed.toFixed(1): setTelemetry({...telemetry, speed: false})} </p>}
+                        {telemetry.heel && <p>Heel: {data.heel != null ? data.heel.toFixed(1): setTelemetry({...telemetry, heel: false})}</p>}
+                        {telemetry.heading && <p>Heading: {data.heading != null ? data.heading.toFixed(0): setTelemetry({...telemetry, heading: false})}</p>}
+                        {telemetry.pitch && <p>Pitch: {data.pitch != null ? data.pitch.toFixed(1): setTelemetry({...telemetry, pitch: false})}</p>}
+                        {telemetry.heartRate && <p>BPM: {data.heartRate != null ? data.heartRate.toFixed(0): setTelemetry({...telemetry, heartRate: false})}</p>}
                         </div>
                 )
             })}    

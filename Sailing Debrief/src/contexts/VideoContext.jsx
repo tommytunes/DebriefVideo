@@ -60,9 +60,20 @@ function videoReducer(state, action) {
                 name: name,
                 type: type,
                 show: false,
-                data: {}
+                data: {},
+                showMap: true
             }
             ]};
+        
+        case 'SET_SHOW_MAP': {
+            const groupId = action.payload;
+            const newDataGroup = state.dataGroups.map(group => 
+                group.id === groupId ?
+                {...group, showMap : !group.showMap} : group
+            );
+
+            return {...state, dataGroups: newDataGroup}
+        }
 
         case 'REPLACE_DATA_GROUP':
             return {...state, dataGroups: action.payload};

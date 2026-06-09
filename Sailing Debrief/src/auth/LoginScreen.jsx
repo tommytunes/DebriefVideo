@@ -34,6 +34,7 @@ export function LoginScreen() {
         claim = await claimDevice();
         } catch (e) {
         console.error('[login] claimDevice threw', e);
+        await supabase.auth.signOut(); 
         return setError('Could not verify this device. Please try again.');
         }
         if (!claim.ok) {

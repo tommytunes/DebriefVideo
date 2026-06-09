@@ -3,6 +3,9 @@ const path = require('path')
 const fs = require('fs')
 const { machineIdSync } = require('node-machine-id');
 const os = require('os');
+const BASE_URL = 'https://sailing-debrief.com/';
+const RACESENSE_URL = 'https://player.vakaros.com/';
+const TELEAPI_URL = 'https://teleapi.regatta.app/';
 
 let win;
 
@@ -74,7 +77,7 @@ function createAppMenu() {
 ipcMain.handle('dialog:openFiles', async (_event, accept, multiple) => {
   const extensions = Object.values(accept || {}).flat().map(e => e.replace(/^\./, ''));
   const filters = extensions.length ? [{ name: 'Files', extensions }] : [];
-  const properties = multiple ? ['openFile'] : ['openFile', 'multiSelections'];
+  const properties = multiple ? ['openFile', 'multiSelections'] : ['openFile'];
   const { canceled, filePaths } = await dialog.showOpenDialog({
     properties: properties,
     filters,
@@ -142,13 +145,16 @@ ipcMain.handle('project:load', async (_event) => {
 })
 
 ipcMain.handle('fetch', async (_event, url) => {
+  if (!url.startsWith(BASE_URL) && !url.startsWith(RACESENSE_URL) && !url.startsWith(TELEAPI_URL)) throw new Error('Url not allowed');
   const res = await fetch(url);
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return await res.json();
 })
 
-ipcMain.handle('shell:openExternal', (_e, url) => shell.openExternal(url));
-
+ipcMain.handle('shell:openExternal', (_e, url) => {
+  if (!url.startsWith(BASE_URL) && !url.startsWith(RACESENSE_URL)) throw new Error('Url not allowed');
+  shell.openExternal(url)
+});
 ipcMain.handle('auth:getMachineInfo', () => ({
   machineId: machineIdSync({original: false}),
   platform: process.platform,

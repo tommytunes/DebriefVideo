@@ -201,6 +201,7 @@ const VideoSource = () => {
                             accept={{ "video/mp4": [".mp4"], "video/quicktime": [".mov"] }}
                             label="Add Videos"
                             onFiles={onFilesVideo}
+                            multiple={true}
                             />
                         </div>
                     </div>

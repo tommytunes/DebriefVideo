@@ -1,1 +1,1 @@
-export const URL = "http://sailing-debrief.com/";
+export const URL = "https://sailing-debrief.com/";

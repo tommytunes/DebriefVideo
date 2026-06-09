@@ -76,7 +76,7 @@ const GoogleMap = ({absoluteTime}) => {
                 <RecenterButton center={centerData} />
             </div>
             {state.dataGroups.map( (group, i) => {
-                if (group === null) return;
+                if (group === null || group.showMap === false) return;
                 const data = findTelemetryData(group.data.telemetry, absoluteTime);
                 const trailPoints = findTelemetryRange(group.data.telemetry, absoluteTime, state.map.tailLength);
                 const path = trailPoints.map(d => ({lat: d.latitude, lng: d.longitude}));

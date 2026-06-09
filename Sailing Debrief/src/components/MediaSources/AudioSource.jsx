@@ -284,6 +284,7 @@ const AudioSource = () => {
                             accept={{ "audio/mpeg": [".mp3"], "audio/wav": [".wav"], "audio/mp4": [".m4a"] }}
                             label="Add Audios"
                             onFiles={onFilesAudio}
+                            multiple={true}
                             />
                         </div>
                     </div>

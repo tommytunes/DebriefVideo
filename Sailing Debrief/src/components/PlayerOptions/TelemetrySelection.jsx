@@ -29,6 +29,11 @@ const TelemetrySelection= ({state, setState}) => {
                 <input type="checkbox" checked={state.pitch} onChange={(e) => handleCheck(e, 'pitch')} className="checkbox" />
                 Pitch
             </label>
+
+            <label className='label text-black'>
+                <input type="checkbox" checked={state.heartRate} onChange={(e) => handleCheck(e, 'heartRate')} className="checkbox" />
+                Heart Rate
+            </label>
             
             
         </div>

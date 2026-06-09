@@ -1,7 +1,7 @@
-function MediaDropZone({ groupId, accept, label, onFiles }) {
+function MediaDropZone({ groupId, accept, label, onFiles, multiple}) {
 
   const onClick = async () => {
-        const results = await window.electronAPI.openFiles(accept);
+        const results = await window.electronAPI.openFiles(accept, multiple);
         const fileObjects = results.map(r => ({
             name: r.name,
             lastModified: r.lastModified,

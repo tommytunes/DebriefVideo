@@ -31,7 +31,8 @@ function jsonToDataGroup(jsonRows) {
                 pitch: elem.pitch,
                 heading: elem.heading,
                 latitude: elem.lat,
-                longitude: elem.lng
+                longitude: elem.lng,
+                heartRate: null,
             };
         })
         dataGroup.push(
