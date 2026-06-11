@@ -1,7 +1,7 @@
 {
   "name": "sailing-debrief",
   "private": true,
-  "version": "1.2.3",
+  "version": "1.2.4",
   "type": "module",
   "main": "electron/main.cjs",
   "overrides": {
@@ -26,7 +26,8 @@
       "gatekeeperAssess": false,
       "entitlements": "build/entitlements.mac.plist",
       "entitlementsInherit": "build/entitlements.mac.plist",
-      "notarize": true
+      "notarize": true,
+      "signIgnore": ["\\.pak$"]
     },
     "win": {
       "target": [

@@ -1,10 +1,9 @@
-import { useVideo } from "../../contexts/VideoContext";
+import { useVideo } from "../../../contexts/VideoContext";
 import { useState } from "react";
-import { extractMetaDataGPS } from "../../utils/MetaDataGPS";
-import { fetchNewDataGroup } from "../../utils/RacesenseApiLoader";
-import { urlToEventIdDivision } from "../../utils/RacesenseUrlConverter";
-import MediaDropZone from "../Files/MediaDropZone";
-import { Info } from "lucide-react";
+import { extractMetaDataGPS } from "../../../utils/MetaDataGPS";
+import { fetchNewDataGroup } from "../../../utils/RacesenseApiLoader";
+import { urlToEventIdDivision } from "../../../utils/RacesenseUrlConverter";
+import DataGroupCard from "./DataGroupCard";
 
 
     
@@ -18,7 +17,7 @@ const DataSource = () => {
     const VAKAROS_PREFIX = 'https://player.vakaros.com/watch/';
     const isUrlValid = urlValue === '' || urlValue.startsWith(VAKAROS_PREFIX);
     const [showRacesense, setShowRacesense] = useState(false);
-    const [showInfo, setShowInfo] = useState(false);
+    
 
     const handleChange = (e) => {
         setInputValue(e.target.value);
@@ -108,53 +107,17 @@ const DataSource = () => {
         </div>
         {state.dataGroups.length === 0 ?
             <></> :
-            state.dataGroups.map( group =>
-            ( group.type !== 'mark' &&
-                <div key={group.id} className="card card-border w-full max-w-100 mx-auto my-4">
-                        <div className="card-body">
-                            <div className="flex flex-row justify-between">
-                                <h1 className="font-bold">{group.name}</h1>
-                                <button onClick={() => setShowInfo(!showInfo)}><Info/></button>
-                            </div>
-                            <div>
-                                <button onClick={() => handleDeleteGroup(group.id)} className="btn btn-sm">Delete Group</button>
-                            </div>
-                            <ul key={group.id} className="list">
-                                {(group.data?.file || group.data?.source === 'racesense') &&
-                                    <div key={group.data.id} className="list-row">
-                                        <div>
-                                            {group.data?.source === 'filesystem' ?
-                                            <li key={group.data.id} className="list-col-grow">{group.data.file.name}</li> :
-                                            <li key={group.data.id} className="list-col-grow">Data from Racesense tracking</li>
-                                            }
-                                            {group.data.missing && <p className="text-xs text-orange-500">File missing</p>}
-                                        </div>
-
-                                        <button onClick={() => handleDeleteData(group.id)} className=" btn btn-sm">Delete</button>
-
-                                    </div>
-                                }
-                            </ul>
-                            {showInfo && group.data?.source === 'filesystem' && (group.data?.file || group.data?.source === 'racesense') &&
-                                <label><input type="checkbox" className="checkbox" onClick={() => dispatch({type:'SET_SHOW_MAP', payload: group.id})} checked={!group.showMap}/> Hide Data on Map</label>
-                            }
-                            {!group.data?.file && (group.data?.source !== 'racesense') &&
-                            <div className="flex flex-col">
-                            <p className="text text-gray-500 font-mono text-xs pb-2">Accepted: .vkx & .fit</p>
-                            <MediaDropZone 
-                                groupId={group.id}
-                                accept={{ "application/octet-stream": [".vkx", ".fit"] }}
-                                label="Add Data"
-                                onFiles={onFilesData}
-                                multiple={false}
-                            />
-                            
-                            </div>
-                            }
-                        </div>
-                    </div>
-            )
-            )
+            state.dataGroups.map( group => 
+           
+                <DataGroupCard 
+                key={group.id}
+                group={group}
+                handleDeleteGroup={handleDeleteGroup}
+                handleDeleteData={handleDeleteData}
+                onFilesData={onFilesData}
+                dispatch={dispatch}
+                />
+        )
         }
         </div>
     );

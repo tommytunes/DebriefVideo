@@ -103,7 +103,7 @@ if (!file._filePath) {
 async function parseGarminFIT(file) {
     const content = await file.arrayBuffer();
     const data = [];
-    let records;
+    let records = [];
 
     const fitParser = new FitParser({
         force: true, 
@@ -123,7 +123,7 @@ async function parseGarminFIT(file) {
         if (record.position_lat == null || record.position_long == null) continue;
         data.push({
             timestamp: BigInt(Math.round(record.timestamp.getTime())), // microseconds, matches VKX
-            speed: (record.enhanced_speed ?? record.speed ?? 0) * 0.539957, // m/s → knots
+            speed: (record.enhanced_speed ?? record.speed ?? 0) * 0.539957, // km/h → knots
             heel: null,
             pitch: null,
             heading: record.position_crs ?? null, // COG in degrees

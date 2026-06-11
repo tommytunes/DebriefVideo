@@ -1,11 +1,11 @@
 import VideoPlayback from "./components/Playback/SourcePlayback";
-import VideoSource from "./components/MediaSources/VideoSource";
+import VideoSource from "./components/MediaSources/VideoSource/VideoSource";
 import NavBar from "./components/NavBar/NavBar";
 import TimelineEditor from "./components/Timeline/Timeline";
-import AudioSource from "./components/MediaSources/AudioSource";
+import AudioSource from "./components/MediaSources/AudioSource/AudioSource";
 import AudioPlayback from "./components/Playback/AudioPlayback";
 import {Routes, Route, useLocation} from "react-router-dom";
-import DataSource from "./components/MediaSources/DataSource";
+import DataSource from "./components/MediaSources/DataSource/DataSource";
 import ProjectSaveLoad from "./components/Files/ProjectSaveLoad";
 import TimelineSidebar from "./components/Timeline/TimelineSidebar";
 import { useAuth } from "./auth/AuthProvider";

@@ -1,7 +1,7 @@
-import MediaDropZone from "../Files/MediaDropZone";
-import { useVideo } from '../../contexts/VideoContext';
+import MediaDropZone from "../../Files/MediaDropZone";
+import { useVideo } from '../../../contexts/VideoContext';
 import { useState } from 'react';
-import { extractMetaDataAudio, resolveAudioTimestamp, pickAudioAuto } from '../../utils/MetaDataAudio';
+import { extractMetaDataAudio, resolveAudioTimestamp, pickAudioAuto } from '../../../utils/MetaDataAudio';
 
 const SOURCE_LABELS = {
     filename: 'Filename (DJI)',

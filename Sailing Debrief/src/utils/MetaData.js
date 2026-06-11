@@ -188,7 +188,15 @@ export async function extractAllTimestampSources(file) {
         getDjiSrtTimestamp(file)
     ]);
 
-    const duration = info && info.timescale ? info.duration / info.timescale : 0;
+    const duration = (() => {
+    if (!info) return 0;
+    if (info.duration > 0 && info.timescale > 0) return info.duration / info.timescale;
+    // fMP4 fallback: use the longest track duration
+    const trackDurations = (info.tracks ?? []).map(t =>
+        t.timescale > 0 ? t.duration / t.timescale : 0
+    );
+    return Math.max(0, ...trackDurations);
+    })();
 
     const apple = getApple(mp4boxfile);
     const mvhd = getMvhd(info);

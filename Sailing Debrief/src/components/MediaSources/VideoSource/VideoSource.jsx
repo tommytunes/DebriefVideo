@@ -1,7 +1,7 @@
-import MediaDropZone from "../Files/MediaDropZone";
-import { useVideo } from '../../contexts/VideoContext';
+import MediaDropZone from "../../Files/MediaDropZone";
+import { useVideo } from '../../../contexts/VideoContext';
 import { useState } from 'react';
-import { extractMetaDataVideo, resolveTimestamp, pickAuto } from '../../utils/MetaData';
+import { extractMetaDataVideo, resolveTimestamp, pickAuto } from '../../../utils/MetaData';
 
 const SOURCE_LABELS = {
     apple: 'QuickTime Creation',
