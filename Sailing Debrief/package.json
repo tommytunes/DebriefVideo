@@ -27,7 +27,9 @@
       "entitlements": "build/entitlements.mac.plist",
       "entitlementsInherit": "build/entitlements.mac.plist",
       "notarize": true,
-      "signIgnore": ["\\.pak$"]
+      "signIgnore": [
+        "\\.pak$"
+      ]
     },
     "win": {
       "target": [
@@ -75,7 +77,8 @@
     "react-dropzone": "^14.3.8",
     "react-router-dom": "^7.13.0",
     "recharts": "^3.8.1",
-    "tailwindcss": "^4.1.18"
+    "tailwindcss": "^4.1.18",
+    "videojs-vr": "^2.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",

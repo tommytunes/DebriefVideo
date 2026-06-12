@@ -28,7 +28,8 @@ function videoReducer(state, action) {
                 id: crypto.randomUUID(),
                 name: action.payload,
                 videos: [],
-                muted: true
+                muted: true,
+                is360: false
             }
             ]}
         
@@ -101,8 +102,15 @@ function videoReducer(state, action) {
             );
             return {...state, dataGroups: updatedDataGroups};
 
+        case 'TOGGLE_360_VIDEO': {
+            const newGroups = state.videoGroups.map(group =>
+                group.id === action.payload ? { ...group, is360: !group.is360 } : group
+            );
+            return { ...state, videoGroups: newGroups };
+        }
+
         case 'INVERT_MUTE_VIDEO':
-            const newMutedGroups = state.videoGroups.map( group => 
+            const newMutedGroups = state.videoGroups.map( group =>
                 group.id === action.payload
                 ? { ...group, muted: !group.muted} :
                 group

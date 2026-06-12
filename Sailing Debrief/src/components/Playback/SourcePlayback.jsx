@@ -11,6 +11,7 @@ import VideoOverlaySelection from '../PlayerOptions/VideoOverlaySelection';
 import TelemetryGraphs from '../Graphs/TelemetryGraphs';
 import GraphOptions from '../Graphs/GraphOptions';
 import VideoTimestampVariation from './VideoTimestampVariation';
+import VRPlayback from './VRPlayback';
 
 const VideoPlayback = () => {
     const { state, dispatch } = useVideo();
@@ -144,7 +145,16 @@ const VideoPlayback = () => {
         </div>
         :
         (!isGap1 && video1) && (splitRatio > 0) ?
+
         <div key="video1" className="relative h-full w-full bg-black overflow-hidden" style={{width: `${splitRatio * 100}%`}}>
+            {group1?.is360 
+            ? <VRPlayback
+             videoRef={videoRef1}
+             src={video1.url}
+             offsetInVideo={offsetInVideo1}
+             isPlaying={isPlaying}
+             muted={group1.muted}
+           /> :
             <video
             ref={videoRef1}
             src={video1.url}
@@ -152,7 +162,7 @@ const VideoPlayback = () => {
             preload='auto'
             muted={group1.muted}
             onError={ () => dispatch({type: 'SET_VIDEO_MISSING', payload : { vidGroupId: state.groupIdVideo1, vidId: video1.id, missingVid: true }})}
-            />
+            /> }
             <VideoOverlay absoluteTime={absoluteTime}/>
             <div className='absolute top-2 right-2'>
                 <VideoOverlaySelection />
@@ -194,6 +204,16 @@ const VideoPlayback = () => {
 
         (!isGap2 && video2) && (splitRatio < 1) ?
         <div key="video2" className="relative h-full w-full bg-black overflow-hidden" style={{width: `${(1 - splitRatio) * 100}%`}}>
+            {group2?.is360 
+            ? 
+            <VRPlayback
+             videoRef={videoRef1}
+             src={video1.url}
+             offsetInVideo={offsetInVideo1}
+             isPlaying={isPlaying}
+             muted={group1.muted}
+            /> 
+            : 
             <video
             ref={videoRef2}
             src={video2.url}
@@ -201,7 +221,7 @@ const VideoPlayback = () => {
             preload='auto'
             muted={group2.muted}
             onError={ () => dispatch({type: 'SET_VIDEO_MISSING', payload : { vidGroupId: state.groupIdVideo2, vidId: video2.id, missingVid: true }})}
-            />
+            /> }
             <VideoOverlay absoluteTime={absoluteTime}/>
             <div className='absolute top-2 right-2'>
                 <VideoOverlaySelection />

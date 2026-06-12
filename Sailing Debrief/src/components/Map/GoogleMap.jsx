@@ -72,7 +72,7 @@ const GoogleMap = ({absoluteTime}) => {
         <APIProvider apiKey={import.meta.env.VITE_PUBLIC_GOOGLE_MAPS_API_KEY}>
         <div style={{ height: "100%", width:"100%", position: 'relative'}}>
             <div className='absolute gap-2 flex flex-col'>
-                <WindHeadingInput />
+                <WindHeadingInput firstGroupTel={firstGroup.data.telemetry} absoluteTime={absoluteTime}/>
                 <RecenterButton center={centerData} />
             </div>
             {state.dataGroups.map( (group, i) => {
