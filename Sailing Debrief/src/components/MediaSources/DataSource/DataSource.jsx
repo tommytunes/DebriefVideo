@@ -14,7 +14,7 @@ const DataSource = () => {
     const [urlValue, setUrlValue] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [apiError, setApiError] = useState('');
-    const VAKAROS_PREFIX = 'https://player.vakaros.com/watch/';
+    const VAKAROS_PREFIX = 'https://racesense.vakaros.com/watch/';
     const isUrlValid = urlValue === '' || urlValue.startsWith(VAKAROS_PREFIX);
     const [showRacesense, setShowRacesense] = useState(false);
     
@@ -29,8 +29,8 @@ const DataSource = () => {
         setIsLoading(true);
         setApiError('');
         try {
-            const { eventId, division } = urlToEventIdDivision(urlValue);
-            const groups = await fetchNewDataGroup({eventId, division});
+            const { eventId, division, day } = urlToEventIdDivision(urlValue);
+            const groups = await fetchNewDataGroup({eventId, division, day});
             dispatch({type: 'REPLACE_DATA_GROUP', payload: groups})
         }
 
@@ -93,8 +93,8 @@ const DataSource = () => {
                     <form onSubmit={handleApiSubmit}>
                         <label className="flex flex-col gap-1 mb-2">
                             Racesense Url:
-                            <input type="text" placeholder="https://player.vakaros.com/watch/..." className={`input ${!isUrlValid ? 'input-error' : ''}`} value={urlValue} onChange={e => setUrlValue(e.target.value)} required />
-                            {!isUrlValid && <span className="text-error text-sm">URL must start with https://player.vakaros.com/watch/</span>}
+                            <input type="text" placeholder="https://racesense.vakaros.com/watch/..." className={`input ${!isUrlValid ? 'input-error' : ''}`} value={urlValue} onChange={e => setUrlValue(e.target.value)} required />
+                            {!isUrlValid && <span className="text-error text-sm">URL must start with https://racesense.vakaros.com/watch/</span>}
                         </label>
                         <button type="submit" className="btn m-2" disabled={isLoading || !isUrlValid}>
                             {isLoading ? 'Loading...': 'Load Racesense Data'}

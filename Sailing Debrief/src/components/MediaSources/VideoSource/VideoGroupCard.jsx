@@ -67,7 +67,7 @@ const VideoGroupCard = ({ group, handleDeleteGroup, handleDeleteVideo, handleSou
                                     <div className="flex flex-col gap-1 mt-1">
                                         <label className="text-xs">Timestamp source</label>
                                         <select
-                                            className="select select-xs"
+                                            className="select select-xs w-40"
                                             value={video.timestampSource ?? 'auto'}
                                             onChange={(e) => handleSourceChange(group.id, video, e.target.value)}
                                         >

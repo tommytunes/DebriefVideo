@@ -1,6 +1,6 @@
 import { ROW_SIZES, MS_TO_KNOTS } from "../constants/GpsConstants";
 import FitParser from 'fit-file-parser'
-import { calculateBearing } from "./FindTelemetryData";
+import { calculateBearing, smoothField } from "./FindTelemetryData";
 
 export async function extractMetaDataGPS(file) {
     const ext = file.name.split('.').pop().toLowerCase();
@@ -97,7 +97,7 @@ if (!file._filePath) {
             offset += size;
         }
     }
-    return data;
+    return smoothField(data, 'heel');
 }
 
 async function parseGarminFIT(file) {

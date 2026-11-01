@@ -1,3 +1,4 @@
+import { smoothField } from "./FindTelemetryData.js";
 
 async function fetchStartEndTime(eventId, division) {
     const url = 
@@ -6,6 +7,21 @@ async function fetchStartEndTime(eventId, division) {
     const json = await window.electronAPI.fetchUrl(url);
 
     return {start: json.time_ranges[0].begin, end: json.time_ranges[0].end}
+}
+
+// ponytail: UTC day bucketing; switch to event-local tz if a race straddles UTC midnight
+export function pickDayRange(summary, day) {
+    const races = summary.divisions
+        .flatMap(d => d.races.map(r => ({...r, division: d.division})))
+        .filter(r => new Date(r.begin).toISOString().slice(0, 10) === day);
+
+    if (races.length === 0) return null;
+
+    return {
+        division: races[0].division,
+        start: Math.min(...races.map(r => r.begin)),
+        end: Math.max(...races.map(r => r.end))
+    };
 }
 
 function jsonToDataGroup(jsonRows) {
@@ -23,7 +39,7 @@ function jsonToDataGroup(jsonRows) {
     })
 
     map.forEach( (info, sn) => {
-        const telemetry = info.map(elem => {
+        const telemetry = smoothField(info.map(elem => {
             return {
                 timestamp: BigInt(elem.timestamp),
                 speed: elem.speed,
@@ -34,7 +50,7 @@ function jsonToDataGroup(jsonRows) {
                 longitude: elem.lng,
                 heartRate: null,
             };
-        })
+        }), 'heel')
         dataGroup.push(
             {id: crypto.randomUUID(),
             name: info[0].sailNum,
@@ -45,9 +61,13 @@ function jsonToDataGroup(jsonRows) {
     return dataGroup;
 }
 
-export async function fetchNewDataGroup({eventId, division, limit = 100000}) {
+export async function fetchNewDataGroup({eventId, division, day, limit = 100000}) {
 
-    const {start, end} = await fetchStartEndTime(eventId, division);
+    const resolved = day
+        ? pickDayRange(await window.electronAPI.fetchUrl(`https://teleapi.regatta.app/telemetry/racing-summary/${eventId}`), day)
+        : null;
+    const {start, end} = resolved ?? await fetchStartEndTime(eventId, division);
+    division = resolved?.division ?? division;
 
     const url = 
     `https://teleapi.regatta.app/telemetry/event/${eventId}?after=${start}&before=${end}&division=${division}&limit=${limit}`

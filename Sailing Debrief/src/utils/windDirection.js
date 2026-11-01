@@ -16,10 +16,16 @@ export function windDirection(telemetry) {
     let averageSpeedCount1 = 0;
     let averageSpeedCount2 = 0;
 
+    const TACK_WINDOW = 30_000;
+    const COOLDWOWN = 60_000;
+
     
     telemetry.forEach( data => {
         if (data.speed < 2 || data.heading == null) return;
         const doubleHeading = data.heading * 2;
+
+        // tack check goes here
+
 
         sinSumDouble += Math.sin( doubleHeading * ( Math.PI / 180));
         cosSumDouble += Math.cos(doubleHeading * (Math.PI / 180));
