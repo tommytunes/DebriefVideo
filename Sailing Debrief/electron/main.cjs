@@ -3,7 +3,7 @@ const path = require('path')
 const fs = require('fs')
 const { machineIdSync } = require('node-machine-id');
 const os = require('os');
-const BASE_URL = 'https://sailing-debrief.com/';
+const BASE_URL = 'https://www.sailing-debrief.com/';
 const RACESENSE_URL = 'https://player.vakaros.com/';
 const TELEAPI_URL = 'https://teleapi.regatta.app/';
 
