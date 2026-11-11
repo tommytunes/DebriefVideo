@@ -21,7 +21,7 @@ import MarkMarker from './MarkMarker';
 
 const GoogleMap = ({absoluteTime}) => {
     const { state } = useVideo();
-    const firstGroup = state.dataGroups[0];
+    const firstGroup = state.dataGroups.find(g => g.type !== 'wind');
     if (!firstGroup) return null;
 
     const [isOnline, setIsOnline] = useState(navigator.onLine);
@@ -76,7 +76,7 @@ const GoogleMap = ({absoluteTime}) => {
                 <RecenterButton center={centerData} />
             </div>
             {state.dataGroups.map( (group, i) => {
-                if (group === null || group.showMap === false) return;
+                if (group === null || group.showMap === false || group.type === 'wind') return;
                 const data = findTelemetryData(group.data.telemetry, absoluteTime);
                 const trailPoints = findTelemetryRange(group.data.telemetry, absoluteTime, state.map.tailLength);
                 const path = trailPoints.map(d => ({lat: d.latitude, lng: d.longitude}));

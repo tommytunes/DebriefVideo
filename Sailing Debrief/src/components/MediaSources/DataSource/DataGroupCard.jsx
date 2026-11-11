@@ -13,7 +13,7 @@ const DataGroupCard = ({key, group, handleDeleteGroup, handleDeleteData, onFiles
                         <div className="card-body">
                             <div className="flex flex-row justify-between">
                                 <h1 className="font-bold">{group.name}</h1>
-                                {group.data?.source === 'filesystem' && <button onClick={() => setShowInfo(!showInfo)}><Info/></button>}
+                                {group.data?.source === 'filesystem' && group.type !== 'wind' && <button onClick={() => setShowInfo(!showInfo)}><Info/></button>}
                             </div>
                             <div>
                                 <button onClick={() => handleDeleteGroup(group.id)} className="btn btn-sm">Delete Group</button>
@@ -29,7 +29,9 @@ const DataGroupCard = ({key, group, handleDeleteGroup, handleDeleteData, onFiles
                                             {group.data.missing && <p className="text-xs text-orange-500">File missing</p>}
                                         </div>
 
-                                        <button onClick={() => handleDeleteData(group.id)} className=" btn btn-sm">Delete</button>
+                                        {group.type !== 'wind' &&
+                                            <button onClick={() => handleDeleteData(group.id)} className=" btn btn-sm">Delete</button>
+                                        }
 
                                     </div>
                                 }

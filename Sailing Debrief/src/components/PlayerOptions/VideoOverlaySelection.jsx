@@ -12,7 +12,7 @@ const VideoOverlaySelection = () => {
                 <div className="flex flex-col max-h-48 overflow-y-auto">
                 <input className="input" type="text" placeholder="Search..." onChange={(e) => setSearchValue(e.target.value)} />
                 {state.dataGroups.filter(group => group.name.startsWith(searchValue)).map( group => {
-                    if (group.type === 'mark') return;
+                    if (group.type === 'mark' || group.type === 'wind') return;
                     return(
                     <div className="flex flex-row justify-between">
                         <h1>{group.name}</h1>

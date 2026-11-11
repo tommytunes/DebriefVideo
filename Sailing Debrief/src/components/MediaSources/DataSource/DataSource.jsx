@@ -3,7 +3,9 @@ import { useState } from "react";
 import { extractMetaDataGPS } from "../../../utils/MetaDataGPS";
 import { fetchNewDataGroup } from "../../../utils/RacesenseApiLoader";
 import { urlToEventIdDivision } from "../../../utils/RacesenseUrlConverter";
+import { parseWind } from "../../../utils/MetaDataWind";
 import DataGroupCard from "./DataGroupCard";
+import MediaDropZone from "../../Files/MediaDropZone";
 
 
     
@@ -17,6 +19,7 @@ const DataSource = () => {
     const VAKAROS_PREFIX = 'https://racesense.vakaros.com/watch/';
     const isUrlValid = urlValue === '' || urlValue.startsWith(VAKAROS_PREFIX);
     const [showRacesense, setShowRacesense] = useState(false);
+    const [showWind, setShowWind] = useState(false);
     
 
     const handleChange = (e) => {
@@ -73,6 +76,21 @@ const DataSource = () => {
         dispatch({ type: 'ADD_DATA', payload: { data, groupId } });
     };
 
+    const onFilesWind = async (files) => {
+        const file = files[0];
+        if (!file) return; // dialog cancelled
+        const groupId = crypto.randomUUID();
+        let telemetry = [];
+        try {
+            telemetry = await parseWind(file);
+        } catch (err) {
+            console.error('[DataSource] Wind parse error for', file.name, err);
+        }
+        dispatch({ type: 'ADD_DATA_GROUP', payload: { id: groupId, name: 'Wind', type: 'wind' } });
+        dispatch({ type: 'ADD_DATA', payload: { groupId, data: [{ id: crypto.randomUUID(), file, url: 'file://' + file._filePath, source: 'filesystem', telemetry, missing: false }] } });
+        setShowWind(false);
+    };
+
     return (
         <div className="flex flex-col">
          <div className="card card-border w-full max-w-100 mx-auto my-4">
@@ -85,8 +103,9 @@ const DataSource = () => {
                     </label>
                     <button type='submit' className="btn m-2">Add Data Group</button>
                 </form>
-                <div>
+                <div className='flex flex-row gap-2'>
                     <button className="btn btn-xs" onClick={() => setShowRacesense(!showRacesense)} disabled={isLoading}>RaceSense Data</button>
+                    <button className="btn btn-xs" onClick={() => setShowWind(!showWind)}>Wind Data</button>
                 </div>
 
                 { showRacesense &&
@@ -102,14 +121,26 @@ const DataSource = () => {
                         {apiError && <p className="text-error text-sm mt-1">{apiError}</p>}
                     </form>
                 }
+
+                { showWind && 
+
+                    <div className="flex flex-col">
+                        <MediaDropZone
+                                accept={{ "text/csv": [".csv"] }}
+                                label="Add Wind Data"
+                                onFiles={onFilesWind}
+                                multiple={false}
+                        />
+                    </div>
+
+                }
                 
             </div>
         </div>
         {state.dataGroups.length === 0 ?
             <></> :
-            state.dataGroups.map( group => 
-           
-                <DataGroupCard 
+            state.dataGroups.map( group =>
+                <DataGroupCard
                 key={group.id}
                 group={group}
                 handleDeleteGroup={handleDeleteGroup}

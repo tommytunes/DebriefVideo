@@ -55,9 +55,9 @@ function videoReducer(state, action) {
             return {...state, audioGroups: deleteAudioGroups };
         
         case 'ADD_DATA_GROUP': {
-            const { name, type } = action.payload;
+            const { name, type, id } = action.payload;
             return {...state, dataGroups:[...state.dataGroups, {
-                id: crypto.randomUUID(),
+                id: id ?? crypto.randomUUID(),
                 name: name,
                 type: type,
                 show: false,
@@ -65,6 +65,7 @@ function videoReducer(state, action) {
                 showMap: true
             }
             ]}};
+        
         
         case 'SET_SHOW_MAP': {
             const groupId = action.payload;

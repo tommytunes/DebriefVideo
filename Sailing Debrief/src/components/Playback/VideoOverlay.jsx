@@ -11,10 +11,21 @@ const VideoOverlay = ({absoluteTime}) => {
         <>
         { state.dataGroups.length > 0 &&
             <div className='absolute top-2 left-2 bottom-2 flex flex-col flex-wrap gap-2'>
+            {state.dataGroups.filter(g => g.type === 'wind' ).map(group => {
+                const tel = group.data.telemetry;
+                if (!tel?.length || absoluteTime < Number(tel[0].timestamp) || absoluteTime > Number(tel.at(-1).timestamp)) return null;
+                const data = findTelemetryData(tel, absoluteTime);
+                return (
+                    <div key={group.id} className="bg-gray-500/60 text-white text-xl font-bold px-2 py-1 rounded">
+                        <p>TWS: {data.windSpeed.toFixed(1)}</p>
+                        <p>TWD: {data.windDirection.toFixed(0)}°</p>
+                    </div>
+                );
+            })}
             {state.dataGroups.map((group) => {
                 const [telemetry, setTelemetry] = useState({speed: true, heel: true, heading: true, pitch: true, heartRate: true})
                 if (!group.show) return;
-                if (group.type === 'mark') return;
+                if (group.type === 'mark' || group.type === 'wind') return;
                 const data = findTelemetryData(group.data.telemetry, absoluteTime);
                 if (data === null) return;
                 

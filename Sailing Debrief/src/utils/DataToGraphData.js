@@ -32,7 +32,7 @@ export function autoAxis(rows, keys, {minSpan = 1, floor = -Infinity} = {}) {
 
 export function dataToGraphData(dataGroups, absoluteTime, windowMs, metric) {
     const groups = dataGroups.filter(
-        g => g.type !== 'mark' && g.data?.telemetry?.length
+        g => g.type !== 'mark' && g.type !== 'wind' && g.data?.telemetry?.length
     );
 
     if (groups.length === 0) return { rows: [], series: [], domain: ['auto', 'auto'], ticks: undefined };
